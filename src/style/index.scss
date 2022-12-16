@@ -1,0 +1,43 @@
+@use 'sass:meta' as *;
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    /* pointer-events: none; */
+
+    &:focus {
+        outline: 0;
+    }
+}
+
+body {
+    background-color: #040404;
+    color: #f2f2f2;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: monospace;
+
+    > div {
+        height: 100%;
+    }
+}
+
+@include load-css('./content.scss');
+@include load-css('./info.scss');
+
+#under_ground {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    z-index: -10;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#under_ground img {
+    max-width: 100%;
+}

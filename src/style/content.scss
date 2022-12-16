@@ -1,0 +1,84 @@
+@use 'sass:meta' as *;
+
+.content {
+    width: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: none;
+
+    .plate {
+        width: 95%;
+        height: 95%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        img,
+        video {
+            max-width: 100%;
+            max-height: 100%;
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+        }
+
+        img {
+            object-fit: contain;
+        }
+
+        .slideshow_bar {
+            --height: 3px;
+            position: absolute;
+            top: 0;
+            z-index: 0;
+            width: 100%;
+            height: var(--height);
+
+            > div {
+                width: 0%;
+                height: 100%;
+                background-color: #940cfe;
+            }
+        }
+
+        .volume {
+            --width: 5px;
+            position: absolute;
+            border-radius: 5px;
+            overflow: hidden;
+            right: 5px;
+            height: 100px;
+            width: var(--width);
+            bottom: 20px;
+            display: flex;
+            align-items: flex-end;
+
+            > div {
+                width: 100%;
+                height: 30%;
+                background-color: #fd0079;
+            }
+        }
+
+        .timeline {
+            --height: 3px;
+            position: absolute;
+            overflow: hidden;
+            width: 100%;
+            height: var(--height);
+            bottom: 5px;
+            display: flex;
+            align-items: flex-end;
+
+            > div {
+                height: 100%;
+                width: 0%;
+                background-color: #0351c1;
+            }
+        }
+    }
+
+    @include load-css('./overlay_info.scss');
+}

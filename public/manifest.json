@@ -1,0 +1,45 @@
+{
+    "manifest_version": 3,
+
+    "name": "Cerberus",
+    "short_name": "Cerberus",
+    "description": "keyboard oriented imagebord viewer.",
+    "version": "0.1.0",
+
+    "action": {
+        "default_icon": "image/icon24.png",
+        "default_popup": "popup/popup.html"
+    },
+
+    "incognito": "split",
+
+    "icons": {
+        "16": "image/icon16.png",
+        "24": "image/icon24.png",
+        "32": "image/icon32.png",
+        "128": "image/icon128.png"
+    },
+
+    "permissions": [
+        "unlimitedStorage",
+        "storage",
+        "webRequest",
+        "declarativeNetRequestWithHostAccess",
+        "downloads"
+    ],
+    "host_permissions": [
+        "https://danbooru.donmai.us/*",
+        "https://*.gelbooru.com/*",
+        "https://rule34.xxx/*",
+        "https://yande.re/*"
+    ],
+    "declarative_net_request": {
+        "rule_resources": [
+            {
+                "id": "ruleset_header_referer",
+                "enabled": false,
+                "path": "rules_header_referer.json"
+            }
+        ]
+    }
+}
