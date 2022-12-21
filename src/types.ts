@@ -1,5 +1,5 @@
 type Rating = 'questionable' | 'safe' | 'explicit'
-type Mode = 'V' | 'O' | 'I' | 'Z'
+type Mode = 'V' | 'O' | 'I' | 'Z' | 'C'
 
 interface StateModel {
     tab: 'info' | 'content'

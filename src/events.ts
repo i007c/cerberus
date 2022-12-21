@@ -17,6 +17,7 @@ import {
     slideshow,
     toggle_fullscreen,
     update_autocomplete,
+    update_server,
     update_video_time,
 } from 'utils'
 
@@ -45,6 +46,10 @@ const ModeData: ModeDataModel = {
         event: mode_options,
         setup: () => (info_tab.className = 'info active'),
         clean: () => (info_tab.className = 'info'),
+    },
+    C: {
+        event: mode_copy,
+        setup: () => !State.post && update_mode('V'),
     },
 }
 
@@ -82,6 +87,32 @@ function mode_insert(e: KeyboardEvent) {
     }
 }
 
+function mode_copy(e: KeyboardEvent) {
+    if (!State.post) return update_mode('V')
+
+    const copy = (text: string | number) => {
+        e.preventDefault()
+        navigator.clipboard.writeText(`${text}`)
+        update_mode('V')
+    }
+
+    switch (e.code) {
+        case 'KeyI':
+            return copy(State.post.id)
+
+        case 'KeyP':
+            if (State.post.has_children) return copy(`parent:${State.post.id}`)
+
+            if (State.post.parent_id)
+                return copy(`parent:${State.post.parent_id}`)
+
+            return
+
+        case 'KeyT':
+            return copy(State.post.tags.join(' '))
+    }
+}
+
 function mode_view(e: KeyboardEvent) {
     switch (e.code) {
         case 'KeyI':
@@ -92,6 +123,9 @@ function mode_view(e: KeyboardEvent) {
 
         case 'KeyO':
             return update_mode('O')
+
+        case 'KeyC':
+            return update_mode('C')
     }
 
     if (!State.post) return
@@ -242,15 +276,15 @@ function mode_options(e: KeyboardEvent) {
 
         case 'KeyD':
             e.preventDefault()
-            let options = server_opt.querySelectorAll('option')
-            let newopt = options[server_opt.selectedIndex + 1]
-            if (newopt) server_opt.value = newopt.value
-            else server_opt.value = options[0]!.value
+            return update_server(+1)
 
-            // @ts-ignore
-            State.server = SERVERS[server_opt.value]
+        case 'KeyA':
+            e.preventDefault()
+            return update_server(-1)
 
-            return
+        case 'KeyI':
+            e.preventDefault()
+            return update_mode('I')
     }
 }
 
@@ -303,18 +337,27 @@ function setup_events() {
         let pr = (100 / plate_video.duration) * plate_video.currentTime
         timeline_bar.style.width = pr + '%'
     })
+
+    plate_video.addEventListener('pause', () => {
+        timeline_bar.style.backgroundColor = '#1db545'
+        timeline_bar.style.width = '100%'
+    })
+
+    plate_video.addEventListener('play', () => {
+        timeline_bar.style.backgroundColor = '#0351c1'
+        let pr = (100 / plate_video.duration) * plate_video.currentTime
+        timeline_bar.style.width = pr + '%'
+    })
 }
 
 function init() {
-    // render_tags(State_TAGS)
-    // update_tab(false)
-    // if (State.tab === 'info') tags_input.focus()
     // @ts-ignore
     State.server = SERVERS[server_opt.value]
+
     overlay_info.slideshow.textContent = `${State.slideshow.speed}s 🍎`
     plate_video.volume = 0.3
     volume_bar.style.height = plate_video.volume * 100 + '%'
-    volume_bar.style.display = 'none'
+    volume_bar.parentElement!.style.display = 'none'
     timeline_bar.style.display = 'none'
 }
 

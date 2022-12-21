@@ -42,7 +42,8 @@ function update_autocomplete(tags: AutoCompleteTag[]) {
             new RegExp(last_tag || ''),
             match => `<mark>${match}</mark>`
         )
-        count.innerText = tag.count.toLocaleString()
+        if (tag.count === -1) count.innerText = ''
+        else count.innerText = tag.count.toLocaleString()
 
         item.appendChild(name)
         item.appendChild(count)
@@ -88,7 +89,7 @@ function render_content() {
     if (State.post.type === 'video') {
         plate_image.style.display = 'none'
         plate_video.style.display = ''
-        volume_bar.style.display = ''
+        volume_bar.parentElement!.style.display = ''
         timeline_bar.style.display = ''
 
         plate_video.src = State.post.file
@@ -97,7 +98,7 @@ function render_content() {
 
     plate_video.style.display = 'none'
     plate_video.src = ''
-    volume_bar.style.display = 'none'
+    volume_bar.parentElement!.style.display = 'none'
     timeline_bar.style.display = 'none'
     plate_image.style.display = ''
 
@@ -114,40 +115,38 @@ function render_content() {
 }
 
 function update_overlay_info() {
-    if (!State.post) return
+    let POST = State.post
+    if (!POST) return
 
     overlay_info.index.innerText = `${State.index + 1}/${
         State.posts.length
     } | ${State.page}`
 
-    overlay_info.id.innerText = State.post.id.toString()
-    overlay_info.id.onclick = () =>
-        State.post && navigator.clipboard.writeText(State.post.id.toString())
+    overlay_info.id.innerText = POST.id.toString()
 
-    overlay_info.score.innerText = State.post.score.toString()
+    if (POST.score === -1) {
+        overlay_info.score.style.display = 'none'
+    } else {
+        overlay_info.score.innerText = POST.score.toString()
+        overlay_info.score.style.display = ''
+    }
 
-    if (State.post.parent_id) {
+    if (POST.parent_id) {
         overlay_info.parent.style.display = ''
-        overlay_info.parent.innerText = `parent: ${State.post.parent_id}`
-        overlay_info.parent.onclick = () => {
-            State.post &&
-                navigator.clipboard.writeText(`parent:${State.post.parent_id}`)
-        }
+        overlay_info.parent.innerText = `parent: ${POST.parent_id}`
     } else {
         overlay_info.parent.innerText = ''
         overlay_info.parent.style.display = 'none'
-        overlay_info.parent.onclick = null
     }
 
-    overlay_info.rating.innerText = capitalize(State.post.rating)
-    overlay_info.rating.className = 'rating ' + State.post.rating
+    overlay_info.rating.innerText = capitalize(POST.rating)
+    overlay_info.rating.className = 'rating ' + POST.rating
 
     overlay_info.tags.innerHTML = ''
 
-    State.post.tags.forEach(tag => {
+    POST.tags.forEach(tag => {
         let el = document.createElement('span')
         el.innerText = tag
-        el.onclick = () => navigator.clipboard.writeText(tag)
         overlay_info.tags.appendChild(el)
     })
 }
