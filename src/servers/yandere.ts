@@ -28,6 +28,8 @@ const TAGS_TABLE = {
     6: 'faults',
 }
 
+var ACAC = new AbortController()
+
 const yandere: ServerModel = {
     rating_table: {
         q: 'questionable',
@@ -36,10 +38,19 @@ const yandere: ServerModel = {
     },
 
     autocomplete: async function (query) {
-        const url = `https://yande.re/tag.json?name=${query}&order=count&limit=10`
-        const response = await fetch(url)
+        ACAC.abort()
+        ACAC = new AbortController()
 
-        let data: ACD[] = await response.json()
+        const url = `https://yande.re/tag.json?name=${query}&order=count&limit=10`
+
+        let data: ACD[] = []
+
+        try {
+            let response = await fetch(url, { signal: ACAC.signal })
+            data = await response.json()
+        } catch (error) {
+            return []
+        }
 
         return data.map(({ name, count, type }) => {
             return {
@@ -52,12 +63,11 @@ const yandere: ServerModel = {
     },
 
     search: async function (tags, page) {
-        tags = update_tags([...tags], 'order:score')
+        ACAC.abort()
+        tags = update_tags(tags, 'order:score')
         let url = 'https://yande.re/post.json?limit=100&page=' + (page + 1)
 
-        if (tags.length > 0) {
-            url += '&tags=' + tags.join(' ')
-        }
+        if (tags) url += '&tags=' + tags
 
         const response = await fetch(url)
         let data: PD[] = []

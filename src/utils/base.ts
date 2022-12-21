@@ -5,7 +5,6 @@ import {
     plate_image,
     plate_video,
     slideshow_bar,
-    tags_container,
     tags_input,
     timeline_bar,
     volume_bar,
@@ -16,13 +15,18 @@ import { AutoCompleteTag } from 'types'
 var CACHE_CTRL: AbortController | null = null
 
 function update_autocomplete(tags: AutoCompleteTag[]) {
-    if (tags.length === 0) {
+    let last_tag = tags_input.value.split(' ').at(-1)
+
+    if (tags.length === 0 || !last_tag) {
         autocomplete.style.display = 'none'
+        State.autocomplete = null
         return
     }
 
     autocomplete.style.display = ''
     autocomplete.innerHTML = ''
+
+    State.autocomplete = tags[0] ? tags[0].name : null
 
     tags.forEach(tag => {
         const item = document.createElement('li')
@@ -35,7 +39,7 @@ function update_autocomplete(tags: AutoCompleteTag[]) {
         count.className = 'count'
 
         name.innerHTML = tag.name.replace(
-            new RegExp(tags_input.value),
+            new RegExp(last_tag || ''),
             match => `<mark>${match}</mark>`
         )
         count.innerText = tag.count.toLocaleString()
@@ -48,11 +52,11 @@ function update_autocomplete(tags: AutoCompleteTag[]) {
 }
 
 async function search() {
-    let L_POSTS = await State.server.search(State.tags, State.page)
+    let L_POSTS = await State.server.search(tags_input.value, State.page)
 
     if (L_POSTS.length === 0 && State.page > 0) {
         State.page--
-        State.posts = await State.server.search(State.tags, State.page)
+        State.posts = await State.server.search(tags_input.value, State.page)
         State.index = State.posts.length - 1
     } else {
         State.posts = L_POSTS
@@ -73,23 +77,13 @@ function toggle_fullscreen(el: HTMLElement) {
     }
 }
 
-function render_tags(tags: string[]) {
-    // remove all the current tags
-    tags_container.innerHTML = ''
-
-    tags.forEach(tag => {
-        let el = document.createElement('span')
-        el.className = 'tag'
-        el.innerText = tag
-        tags_container.appendChild(el)
-    })
-}
-
 function render_content() {
     if (State.posts.length === 0) return
 
     State.post = State.posts[State.index]!
     update_overlay_info()
+
+    timeline_bar.style.width = '0%'
 
     if (State.post.type === 'video') {
         plate_image.style.display = 'none'
@@ -176,7 +170,10 @@ async function change_content(movement: number) {
     } else if (State.index < 0) {
         if (State.page > 0) {
             State.page--
-            State.posts = await State.server.search(State.tags, State.page)
+            State.posts = await State.server.search(
+                tags_input.value,
+                State.page
+            )
             State.index = State.posts.length - 1
             render_content()
             return
@@ -189,6 +186,7 @@ async function change_content(movement: number) {
     if (bf_idx !== State.index) {
         State.slideshow.pos = 0
         slideshow_bar.style.width = '0%'
+        timeline_bar.style.width = '0%'
 
         if (State.slideshow.running) {
             State.slideshow.running = false
@@ -201,15 +199,6 @@ async function change_content(movement: number) {
     }
 }
 
-function add_tag_2_tags() {
-    if (!tags_input.value || State.tags.includes(tags_input.value)) return
-
-    State.tags.push(tags_input.value)
-    tags_input.value = ''
-    render_tags(State.tags)
-    update_autocomplete([])
-}
-
 async function cache_content(signal: AbortSignal) {
     cache_posts.innerHTML = ''
 
@@ -219,7 +208,10 @@ async function cache_content(signal: AbortSignal) {
         let c_id = State.index + i
         if (c_id >= State.posts.length) {
             State.page++
-            let L_POSTS = await State.server.search(State.tags, State.page)
+            let L_POSTS = await State.server.search(
+                tags_input.value,
+                State.page
+            )
 
             if (L_POSTS.length === 0) {
                 State.page--
@@ -290,6 +282,6 @@ function slideshow() {
     requestAnimationFrame(anime)
 }
 
-export { update_autocomplete, search, toggle_fullscreen, render_tags }
+export { update_autocomplete, search, toggle_fullscreen }
 export { render_content, update_overlay_info, change_content }
-export { add_tag_2_tags, cache_content, slideshow }
+export { cache_content, slideshow }

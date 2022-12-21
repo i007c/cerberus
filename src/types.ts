@@ -3,7 +3,6 @@ type Mode = 'V' | 'O' | 'I' | 'Z'
 
 interface StateModel {
     tab: 'info' | 'content'
-    tags: string[]
     slideshow: {
         speed: number
         running: boolean
@@ -15,11 +14,14 @@ interface StateModel {
     posts: PostModel[]
     server: ServerModel
     mode: Mode
+    autocomplete: string | null
 }
 
 type ModeDataModel = {
     [k in Mode]: {
         event: (e: KeyboardEvent) => void
+        setup?: () => void
+        clean?: () => void
     }
 }
 
@@ -44,7 +46,7 @@ interface PostModel {
 interface ServerModel {
     rating_table: { [k: string]: Rating }
     autocomplete: null | ((query: string) => Promise<AutoCompleteTag[]>)
-    search: (tags: string[], page: number) => Promise<PostModel[]>
+    search: (tags: string, page: number) => Promise<PostModel[]>
     open_post: (post_id: string | number) => void
 }
 

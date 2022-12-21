@@ -3,7 +3,6 @@ import { StateModel } from 'types'
 
 var State: StateModel = {
     tab: 'info',
-    tags: [],
     slideshow: {
         speed: 7,
         running: false,
@@ -15,6 +14,7 @@ var State: StateModel = {
     posts: [],
     server: rule34,
     mode: 'V',
+    autocomplete: null,
 }
 
 const SERVERS = {

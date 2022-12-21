@@ -7,6 +7,8 @@ interface ACD {
     label: string
 }
 
+var ACAC = new AbortController()
+
 const rule34: ServerModel = {
     rating_table: {
         q: 'questionable',
@@ -14,10 +16,18 @@ const rule34: ServerModel = {
         s: 'safe',
     },
     autocomplete: async query => {
-        const url = `https://rule34.xxx/public/autocomplete.php?q=${query}`
-        const response = await fetch(url)
+        ACAC.abort()
+        ACAC = new AbortController()
 
-        let data: ACD[] = await response.json()
+        const url = `https://rule34.xxx/public/autocomplete.php?q=${query}`
+        let data: ACD[] = []
+
+        try {
+            let response = await fetch(url, { signal: ACAC.signal })
+            data = await response.json()
+        } catch (error) {
+            return []
+        }
 
         return data.map(({ value, type, label }) => {
             let count_str = label.split(value + ' ').at(-1)!
@@ -32,12 +42,13 @@ const rule34: ServerModel = {
         })
     },
     search: async function (tags, page) {
-        tags = update_tags([...tags], 'sort:score')
+        ACAC.abort()
+        tags = update_tags(tags, 'sort:score')
         let url = 'https://api.rule34.xxx/index.php?page=dapi&s=post'
         url += '&q=index&pid=' + page
 
-        if (tags.length > 0) {
-            url += '&tags=' + tags.join(' ')
+        if (tags) {
+            url += '&tags=' + tags
         }
 
         const response = await fetch(url)

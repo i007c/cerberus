@@ -4,8 +4,8 @@ const IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif']
 const VIDEO_EXT = ['mp4']
 const Parser = new DOMParser()
 
-const update_tags = (tags: string[], ss_tag: string) => {
-    if (inp_sort_score.checked && ss_tag) tags.push(ss_tag)
+const update_tags = (tags: string, ss_tag: string) => {
+    if (inp_sort_score.checked && ss_tag) tags += ' ' + ss_tag
 
     return tags
 }
