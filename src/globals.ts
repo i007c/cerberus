@@ -15,6 +15,12 @@ var State: StateModel = {
     server: rule34,
     mode: 'V',
     autocomplete: null,
+    zoom: {
+        level: 1,
+        x: 1,
+        y: 1,
+        speed: 10,
+    },
 }
 
 const SERVERS = {

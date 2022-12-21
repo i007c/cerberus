@@ -3,7 +3,9 @@ import {
     inp_sort_score,
     overlay_info,
     plate,
+    plate_image,
     plate_video,
+    plate_zoomed,
     server_opt,
     tags_input,
     timeline_bar,
@@ -19,6 +21,8 @@ import {
     update_autocomplete,
     update_server,
     update_video_time,
+    update_zoom_level,
+    update_zoom_pos,
 } from 'utils'
 
 const ModeData: ModeDataModel = {
@@ -38,6 +42,8 @@ const ModeData: ModeDataModel = {
     },
     Z: {
         event: mode_zoom,
+        setup: zoom_setup,
+        clean: () => (plate_zoomed.parentElement!.style.display = 'none'),
     },
     V: {
         event: mode_view,
@@ -207,7 +213,7 @@ function mode_view(e: KeyboardEvent) {
             console.log('add to favs')
             return
 
-        case 'KeyO':
+        case 'KeyU':
             e.preventDefault()
             if (!State.post) return
             State.server.open_post(State.post.id)
@@ -289,7 +295,59 @@ function mode_options(e: KeyboardEvent) {
 }
 
 function mode_zoom(e: KeyboardEvent) {
-    console.log('zoom', e)
+    switch (e.code) {
+        case 'KeyD':
+            return update_zoom_pos('x', +State.zoom.speed)
+
+        case 'KeyA':
+            return update_zoom_pos('x', -State.zoom.speed)
+
+        case 'KeyW':
+            return update_zoom_pos('y', -State.zoom.speed)
+
+        case 'KeyS':
+            return update_zoom_pos('y', +State.zoom.speed)
+
+        case 'KeyG':
+            State.zoom.speed -= 5
+            if (State.zoom.speed < 1) State.zoom.speed = 1
+            return
+
+        case 'KeyH':
+            State.zoom.speed += 5
+            return
+
+        case 'KeyJ':
+            State.zoom.speed = 10
+            return
+
+        case 'Minus':
+        case 'Digit1':
+            return update_zoom_level(-0.5)
+
+        case 'Equal':
+        case 'Digit3':
+            return update_zoom_level(+0.5)
+
+        case 'KeyZ':
+        case 'Digit0':
+            return update_zoom_level(1, true)
+    }
+}
+
+function zoom_setup() {
+    if (plate_image.naturalWidth < 1 || plate_image.naturalHeight < 1) return
+    plate_zoomed.parentElement!.style.display = ''
+
+    if (plate_image.naturalWidth > plate_image.naturalHeight) {
+        plate_zoomed.width = (plate_image.naturalHeight * 16) / 9
+        plate_zoomed.height = plate_image.naturalHeight
+    } else {
+        plate_zoomed.width = plate_image.naturalWidth
+        plate_zoomed.height = (plate_image.naturalWidth * 9) / 16
+    }
+
+    update_zoom_level(1, true)
 }
 
 function setup_events() {
@@ -359,6 +417,7 @@ function init() {
     volume_bar.style.height = plate_video.volume * 100 + '%'
     volume_bar.parentElement!.style.display = 'none'
     timeline_bar.style.display = 'none'
+    plate_zoomed.parentElement!.style.display = 'none'
 }
 
 export { ModeData }

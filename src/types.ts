@@ -15,6 +15,12 @@ interface StateModel {
     server: ServerModel
     mode: Mode
     autocomplete: string | null
+    zoom: {
+        level: number
+        x: number
+        y: number
+        speed: number
+    }
 }
 
 type ModeDataModel = {

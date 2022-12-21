@@ -45,6 +45,10 @@ const Main = {
                     from: PUBLIC_DIR,
                     to: DIST_DIR,
                 },
+                {
+                    from: resolve(BASE_DIR, 'local'),
+                    to: resolve(DIST_DIR, 'local'),
+                },
             ],
         }),
         new HtmlPlugin({

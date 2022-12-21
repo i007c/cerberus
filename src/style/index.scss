@@ -6,6 +6,7 @@
     box-sizing: border-box;
     user-select: none;
     pointer-events: none;
+    cursor: none;
 
     &:focus {
         outline: 0;

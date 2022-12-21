@@ -9,8 +9,10 @@ const autocomplete = document.querySelector<HTMLUListElement>(
     '.info ul.autocomplete'
 )!
 const plate = content_tab.querySelector<HTMLDivElement>('div.plate')!
-const plate_image = plate.querySelector<HTMLImageElement>('img')!
-const plate_video = plate.querySelector<HTMLVideoElement>('video')!
+const plate_image = plate.querySelector<HTMLImageElement>('img.main')!
+const plate_video = plate.querySelector<HTMLVideoElement>('video.main')!
+const plate_zoomed = plate.querySelector<HTMLCanvasElement>('canvas.zoomed')!
+const plate_context = plate_zoomed.getContext('2d')!
 
 const volume_bar =
     content_tab.querySelector<HTMLDivElement>('div.volume > div')!
@@ -42,5 +44,5 @@ const overlay_info = {
 export { overlay_info, tags_container, cache_posts }
 export { server_opt, tags_input, autocomplete }
 export { volume_bar, timeline_bar, slideshow_bar }
-export { plate, plate_image, plate_video }
+export { plate, plate_image, plate_video, plate_zoomed, plate_context }
 export { content_tab, info_tab, inp_sort_score }
