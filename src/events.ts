@@ -321,6 +321,11 @@ function mode_zoom(e: KeyboardEvent) {
             State.zoom.speed = 10
             return
 
+        case 'KeyF':
+            e.preventDefault()
+            toggle_fullscreen(plate)
+            return
+
         case 'Minus':
         case 'Digit1':
             return update_zoom_level(-0.5)
