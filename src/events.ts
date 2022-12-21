@@ -40,10 +40,6 @@ const ModeData: ModeDataModel = {
     },
     V: {
         event: mode_view,
-        setup: () => {
-            // content_tab.focus()
-            console.log('view setup')
-        },
     },
     O: {
         event: mode_options,
@@ -236,6 +232,7 @@ function mode_options(e: KeyboardEvent) {
         case 'Enter':
             e.preventDefault()
             search()
+            update_mode('V')
             return
 
         case 'KeyS':

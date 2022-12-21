@@ -1,4 +1,4 @@
-import { rule34, yandere } from 'servers'
+import { realbooru, rule34, yandere } from 'servers'
 import { StateModel } from 'types'
 
 var State: StateModel = {
@@ -22,6 +22,7 @@ const SERVERS = {
     yandere: yandere,
     danbooru: rule34,
     gelbooru: rule34,
+    realbooru: realbooru,
 }
 
 export { State, SERVERS }

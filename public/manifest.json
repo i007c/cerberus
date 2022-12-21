@@ -30,8 +30,9 @@
     "host_permissions": [
         "https://danbooru.donmai.us/*",
         "https://*.gelbooru.com/*",
-        "https://rule34.xxx/*",
-        "https://yande.re/*"
+        "https://*.rule34.xxx/*",
+        "https://yande.re/*",
+        "https://*.realbooru.com/*"
     ],
     "declarative_net_request": {
         "rule_resources": [
