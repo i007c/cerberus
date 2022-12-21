@@ -11,6 +11,7 @@ import {
     volume_bar,
 } from 'elements'
 import { SERVERS, State } from 'globals'
+import { ModeDataModel } from 'types'
 import {
     add_tag_2_tags,
     change_content,
@@ -20,6 +21,36 @@ import {
     toggle_fullscreen,
     update_autocomplete,
 } from 'utils'
+
+const ModeData: ModeDataModel = {
+    I: {
+        event: mode_insert,
+    },
+    Z: {
+        event: mode_zoom,
+    },
+    V: {
+        event: mode_view,
+    },
+    O: {
+        event: mode_options,
+    },
+}
+
+function mode_insert(e: KeyboardEvent) {
+    console.log('insert', e)
+}
+function mode_view(e: KeyboardEvent) {
+    console.log('insert', e)
+}
+function mode_options(e: KeyboardEvent) {
+    console.log('insert', e)
+}
+function mode_zoom(e: KeyboardEvent) {
+    console.log('insert', e)
+}
+
+ModeData
 
 function update_tab(toggle = true) {
     if (document.fullscreenElement) return

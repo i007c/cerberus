@@ -14,6 +14,7 @@ var State: StateModel = {
     post: null,
     posts: [],
     server: rule34,
+    mode: 'V',
 }
 
 const SERVERS = {

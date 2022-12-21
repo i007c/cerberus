@@ -1,4 +1,5 @@
 type Rating = 'questionable' | 'safe' | 'explicit'
+type Mode = 'V' | 'O' | 'I' | 'Z'
 
 interface StateModel {
     tab: 'info' | 'content'
@@ -13,6 +14,13 @@ interface StateModel {
     post: PostModel | null
     posts: PostModel[]
     server: ServerModel
+    mode: Mode
+}
+
+type ModeDataModel = {
+    [k in Mode]: {
+        event: (e: KeyboardEvent) => void
+    }
 }
 
 interface AutoCompleteTag {
@@ -41,3 +49,4 @@ interface ServerModel {
 }
 
 export { StateModel, AutoCompleteTag, PostModel, Rating, ServerModel }
+export { Mode, ModeDataModel }
