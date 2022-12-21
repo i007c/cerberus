@@ -48,8 +48,6 @@ function update_autocomplete(tags: AutoCompleteTag[]) {
 }
 
 async function search() {
-    if (!State.server) return
-
     let L_POSTS = await State.server.search(State.tags, State.page)
 
     if (L_POSTS.length === 0 && State.page > 0) {
@@ -161,7 +159,6 @@ function update_overlay_info() {
 }
 
 async function change_content(movement: number) {
-    if (!State.server) return
     if (State.posts.length === 0) {
         State.index = 0
         return
@@ -214,8 +211,6 @@ function add_tag_2_tags() {
 }
 
 async function cache_content(signal: AbortSignal) {
-    if (!State.server) return
-
     cache_posts.innerHTML = ''
 
     for (let i = 1; i <= 3; i++) {

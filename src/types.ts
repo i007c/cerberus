@@ -12,7 +12,7 @@ interface StateModel {
     index: number
     post: PostModel | null
     posts: PostModel[]
-    server: ServerModel | null
+    server: ServerModel
 }
 
 interface AutoCompleteTag {

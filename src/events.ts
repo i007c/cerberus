@@ -58,7 +58,7 @@ function setup_events() {
             update_autocomplete([])
             return
         }
-        if (State.server && State.server.autocomplete) {
+        if (State.server.autocomplete) {
             const data = await State.server.autocomplete(tags_input.value)
             update_autocomplete(data)
         }
@@ -228,7 +228,7 @@ function content_keybinds(e: KeyboardEvent) {
 
         case 'KeyO':
             e.preventDefault()
-            if (!State.post || !State.server) return
+            if (!State.post) return
             State.server.open_post(State.post.id)
             return
     }
