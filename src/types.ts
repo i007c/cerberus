@@ -1,6 +1,6 @@
 type Rating = 'questionable' | 'safe' | 'explicit'
 
-interface CRT_Model {
+interface StateModel {
     tab: 'info' | 'content'
     tags: string[]
     slideshow: {
@@ -40,4 +40,4 @@ interface ServerModel {
     open_post: (post_id: string | number) => void
 }
 
-export { CRT_Model, AutoCompleteTag, PostModel, Rating, ServerModel }
+export { StateModel, AutoCompleteTag, PostModel, Rating, ServerModel }

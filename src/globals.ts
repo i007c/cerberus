@@ -1,7 +1,7 @@
 import { rule34, yandere } from 'servers'
-import { CRT_Model } from 'types'
+import { StateModel } from 'types'
 
-var CRT: CRT_Model = {
+var State: StateModel = {
     tab: 'info',
     tags: [],
     slideshow: {
@@ -38,4 +38,4 @@ const SERVERS = {
 // var overlay_info_ISR = overlay_info.querySelector('.isr')
 // var overlay_info_slideshow = overlay_info.querySelector('.isr .slideshow')
 
-export { CRT, SERVERS }
+export { State, SERVERS }

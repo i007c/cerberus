@@ -10,7 +10,7 @@ import {
     timeline_bar,
     volume_bar,
 } from 'elements'
-import { CRT, SERVERS } from 'globals'
+import { SERVERS, State } from 'globals'
 import {
     add_tag_2_tags,
     change_content,
@@ -25,11 +25,11 @@ function update_tab(toggle = true) {
     if (document.fullscreenElement) return
 
     if (toggle) {
-        CRT.tab = CRT.tab === 'content' ? 'info' : 'content'
+        State.tab = State.tab === 'content' ? 'info' : 'content'
         // update_autocomplete([])
     }
 
-    if (CRT.tab === 'content') {
+    if (State.tab === 'content') {
         content_tab.focus()
         content_tab.className = 'content active'
         info_tab.className = 'info'
@@ -48,9 +48,9 @@ function setup_events() {
 
         if (e.code === 'Tab') return update_tab()
 
-        if (CRT.tab === 'info') return info_tag_input(e)
+        if (State.tab === 'info') return info_tag_input(e)
 
-        if (CRT.tab === 'content') return content_keybinds(e)
+        if (State.tab === 'content') return content_keybinds(e)
     })
 
     tags_input.addEventListener('input', async () => {
@@ -58,8 +58,8 @@ function setup_events() {
             update_autocomplete([])
             return
         }
-        if (CRT.server && CRT.server.autocomplete) {
-            const data = await CRT.server.autocomplete(tags_input.value)
+        if (State.server && State.server.autocomplete) {
+            const data = await State.server.autocomplete(tags_input.value)
             update_autocomplete(data)
         }
     })
@@ -72,8 +72,8 @@ function setup_events() {
 
     server_opt.addEventListener('change', () => {
         // @ts-ignore
-        CRT.server = SERVERS[server_opt.value]
-        console.log(CRT.server)
+        State.server = SERVERS[server_opt.value]
+        console.log(State.server)
     })
 
     plate_video.addEventListener('volumechange', () => {
@@ -100,18 +100,18 @@ function info_tag_input(e: KeyboardEvent) {
             return
 
         case 'Backspace':
-            if (!tags_input.value && CRT.tags.length) {
+            if (!tags_input.value && State.tags.length) {
                 e.preventDefault()
 
-                tags_input.value = CRT.tags.pop() || ''
-                render_tags(CRT.tags)
+                tags_input.value = State.tags.pop() || ''
+                render_tags(State.tags)
                 return
             }
     }
 
     if (e.shiftKey && e.code === 'Delete') {
         e.preventDefault()
-        CRT.tags = []
+        State.tags = []
         render_tags([])
         return
     }
@@ -140,20 +140,20 @@ function info_tag_input(e: KeyboardEvent) {
             else server_opt.value = options[0]!.value
 
             // @ts-ignore
-            CRT.server = SERVERS[server_opt.value]
+            State.server = SERVERS[server_opt.value]
 
             return
     }
 }
 
 function content_keybinds(e: KeyboardEvent) {
-    if (!CRT.post) return
+    if (!State.post) return
 
     switch (!e.ctrlKey && !e.shiftKey && e.code) {
         case 'Space':
-            if (CRT.post.type === 'video') {
-                CRT.slideshow.running = false
-                CRT.slideshow.pos = 0
+            if (State.post.type === 'video') {
+                State.slideshow.running = false
+                State.slideshow.pos = 0
 
                 if (plate_video.paused) plate_video.play()
                 else plate_video.pause()
@@ -161,7 +161,7 @@ function content_keybinds(e: KeyboardEvent) {
                 return
             }
 
-            if (CRT.slideshow.running) CRT.slideshow.running = false
+            if (State.slideshow.running) State.slideshow.running = false
             else slideshow()
 
             return
@@ -173,13 +173,13 @@ function content_keybinds(e: KeyboardEvent) {
 
         case 'Minus':
         case 'Digit1':
-            if (CRT.slideshow.speed === 1) return
-            CRT.slideshow.speed--
+            if (State.slideshow.speed === 1) return
+            State.slideshow.speed--
             return
 
         case 'Equal':
         case 'Digit3':
-            CRT.slideshow.speed++
+            State.slideshow.speed++
             return
 
         // content movement
@@ -228,12 +228,12 @@ function content_keybinds(e: KeyboardEvent) {
 
         case 'KeyO':
             e.preventDefault()
-            if (!CRT.post || !CRT.server) return
-            CRT.server.open_post(CRT.post.id)
+            if (!State.post || !State.server) return
+            State.server.open_post(State.post.id)
             return
     }
 
-    if (CRT.post.type !== 'video') return
+    if (State.post.type !== 'video') return
 
     switch (!e.ctrlKey && !e.shiftKey && e.code) {
         case 'ArrowRight':
@@ -271,12 +271,12 @@ function content_keybinds(e: KeyboardEvent) {
 }
 
 function init() {
-    // render_tags(CRT_TAGS)
+    // render_tags(State_TAGS)
     update_tab(false)
-    if (CRT.tab === 'info') tags_input.focus()
+    if (State.tab === 'info') tags_input.focus()
     // @ts-ignore
-    CRT.server = SERVERS[server_opt.value]
-    overlay_info.slideshow.textContent = `${CRT.slideshow.speed}s 🍎`
+    State.server = SERVERS[server_opt.value]
+    overlay_info.slideshow.textContent = `${State.slideshow.speed}s 🍎`
     plate_video.volume = 0.3
     volume_bar.style.height = plate_video.volume * 100 + '%'
     volume_bar.style.display = 'none'

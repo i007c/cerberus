@@ -10,7 +10,7 @@ import {
     timeline_bar,
     volume_bar,
 } from 'elements'
-import { CRT } from 'globals'
+import { State } from 'globals'
 import { AutoCompleteTag } from 'types'
 
 var CACHE_CTRL: AbortController | null = null
@@ -48,17 +48,17 @@ function update_autocomplete(tags: AutoCompleteTag[]) {
 }
 
 async function search() {
-    if (!CRT.server) return
+    if (!State.server) return
 
-    let L_POSTS = await CRT.server.search(CRT.tags, CRT.page)
+    let L_POSTS = await State.server.search(State.tags, State.page)
 
-    if (L_POSTS.length === 0 && CRT.page > 0) {
-        CRT.page--
-        CRT.posts = await CRT.server.search(CRT.tags, CRT.page)
-        CRT.index = CRT.posts.length - 1
+    if (L_POSTS.length === 0 && State.page > 0) {
+        State.page--
+        State.posts = await State.server.search(State.tags, State.page)
+        State.index = State.posts.length - 1
     } else {
-        CRT.posts = L_POSTS
-        CRT.index = 0
+        State.posts = L_POSTS
+        State.index = 0
     }
     render_content()
 }
@@ -88,18 +88,18 @@ function render_tags(tags: string[]) {
 }
 
 function render_content() {
-    if (CRT.posts.length === 0) return
+    if (State.posts.length === 0) return
 
-    CRT.post = CRT.posts[CRT.index]!
+    State.post = State.posts[State.index]!
     update_overlay_info()
 
-    if (CRT.post.type === 'video') {
+    if (State.post.type === 'video') {
         plate_image.style.display = 'none'
         plate_video.style.display = ''
         volume_bar.style.display = ''
         timeline_bar.style.display = ''
 
-        plate_video.src = CRT.post.file
+        plate_video.src = State.post.file
         return
     }
 
@@ -109,9 +109,9 @@ function render_content() {
     timeline_bar.style.display = 'none'
     plate_image.style.display = ''
 
-    plate_image.src = CRT.post.sample
+    plate_image.src = State.post.sample
 
-    if (!plate_image.complete) CRT.slideshow.running = false
+    if (!plate_image.complete) State.slideshow.running = false
 
     if (CACHE_CTRL) {
         CACHE_CTRL.abort()
@@ -122,24 +122,24 @@ function render_content() {
 }
 
 function update_overlay_info() {
-    if (!CRT.post) return
+    if (!State.post) return
 
-    overlay_info.index.innerText = `${CRT.index + 1}/${CRT.posts.length} | ${
-        CRT.page
-    }`
+    overlay_info.index.innerText = `${State.index + 1}/${
+        State.posts.length
+    } | ${State.page}`
 
-    overlay_info.id.innerText = CRT.post.id.toString()
+    overlay_info.id.innerText = State.post.id.toString()
     overlay_info.id.onclick = () =>
-        CRT.post && navigator.clipboard.writeText(CRT.post.id.toString())
+        State.post && navigator.clipboard.writeText(State.post.id.toString())
 
-    overlay_info.score.innerText = CRT.post.score.toString()
+    overlay_info.score.innerText = State.post.score.toString()
 
-    if (CRT.post.parent_id) {
+    if (State.post.parent_id) {
         overlay_info.parent.style.display = ''
-        overlay_info.parent.innerText = `parent: ${CRT.post.parent_id}`
+        overlay_info.parent.innerText = `parent: ${State.post.parent_id}`
         overlay_info.parent.onclick = () => {
-            CRT.post &&
-                navigator.clipboard.writeText(`parent:${CRT.post.parent_id}`)
+            State.post &&
+                navigator.clipboard.writeText(`parent:${State.post.parent_id}`)
         }
     } else {
         overlay_info.parent.innerText = ''
@@ -147,12 +147,12 @@ function update_overlay_info() {
         overlay_info.parent.onclick = null
     }
 
-    overlay_info.rating.innerText = capitalize(CRT.post.rating)
-    overlay_info.rating.className = 'rating ' + CRT.post.rating
+    overlay_info.rating.innerText = capitalize(State.post.rating)
+    overlay_info.rating.className = 'rating ' + State.post.rating
 
     overlay_info.tags.innerHTML = ''
 
-    CRT.post.tags.forEach(tag => {
+    State.post.tags.forEach(tag => {
         let el = document.createElement('span')
         el.innerText = tag
         el.onclick = () => navigator.clipboard.writeText(tag)
@@ -161,40 +161,40 @@ function update_overlay_info() {
 }
 
 async function change_content(movement: number) {
-    if (!CRT.server) return
-    if (CRT.posts.length === 0) {
-        CRT.index = 0
+    if (!State.server) return
+    if (State.posts.length === 0) {
+        State.index = 0
         return
     }
 
-    let bf_idx = CRT.index
+    let bf_idx = State.index
 
-    CRT.index += movement
+    State.index += movement
 
-    if (CRT.index >= CRT.posts.length) {
-        CRT.page++
-        CRT.index = 0
+    if (State.index >= State.posts.length) {
+        State.page++
+        State.index = 0
         search()
         return
-    } else if (CRT.index < 0) {
-        if (CRT.page > 0) {
-            CRT.page--
-            CRT.posts = await CRT.server.search(CRT.tags, CRT.page)
-            CRT.index = CRT.posts.length - 1
+    } else if (State.index < 0) {
+        if (State.page > 0) {
+            State.page--
+            State.posts = await State.server.search(State.tags, State.page)
+            State.index = State.posts.length - 1
             render_content()
             return
         }
-        CRT.index = 0
+        State.index = 0
         search()
         return
     }
 
-    if (bf_idx !== CRT.index) {
-        CRT.slideshow.pos = 0
+    if (bf_idx !== State.index) {
+        State.slideshow.pos = 0
         slideshow_bar.style.width = '0%'
 
-        if (CRT.slideshow.running) {
-            CRT.slideshow.running = false
+        if (State.slideshow.running) {
+            State.slideshow.running = false
             setTimeout(() => {
                 slideshow()
             }, 500)
@@ -205,37 +205,37 @@ async function change_content(movement: number) {
 }
 
 function add_tag_2_tags() {
-    if (!tags_input.value || CRT.tags.includes(tags_input.value)) return
+    if (!tags_input.value || State.tags.includes(tags_input.value)) return
 
-    CRT.tags.push(tags_input.value)
+    State.tags.push(tags_input.value)
     tags_input.value = ''
-    render_tags(CRT.tags)
+    render_tags(State.tags)
     update_autocomplete([])
 }
 
 async function cache_content(signal: AbortSignal) {
-    if (!CRT.server) return
+    if (!State.server) return
 
     cache_posts.innerHTML = ''
 
     for (let i = 1; i <= 3; i++) {
         if (signal.aborted) break
 
-        let c_id = CRT.index + i
-        if (c_id >= CRT.posts.length) {
-            CRT.page++
-            let L_POSTS = await CRT.server.search(CRT.tags, CRT.page)
+        let c_id = State.index + i
+        if (c_id >= State.posts.length) {
+            State.page++
+            let L_POSTS = await State.server.search(State.tags, State.page)
 
             if (L_POSTS.length === 0) {
-                CRT.page--
+                State.page--
                 break
             }
 
-            CRT.posts = CRT.posts.concat(L_POSTS)
+            State.posts = State.posts.concat(L_POSTS)
             update_overlay_info()
         }
 
-        let item = CRT.posts[c_id]
+        let item = State.posts[c_id]
         if (!item) break
         if (item.type !== 'image') continue
 
@@ -254,34 +254,34 @@ async function cache_content(signal: AbortSignal) {
 }
 
 function slideshow() {
-    CRT.slideshow.running = true
-    let _speed = CRT.slideshow.speed
-    let total = CRT.slideshow.speed * 1000
+    State.slideshow.running = true
+    let _speed = State.slideshow.speed
+    let total = State.slideshow.speed * 1000
     let start = performance.now()
     let progress = 0
 
-    if (CRT.slideshow.pos) {
-        start = start - (total / 100) * CRT.slideshow.pos
+    if (State.slideshow.pos) {
+        start = start - (total / 100) * State.slideshow.pos
     }
 
-    overlay_info.slideshow.textContent = `${CRT.slideshow.speed}s 🍏`
+    overlay_info.slideshow.textContent = `${State.slideshow.speed}s 🍏`
 
     function anime() {
-        if (!CRT.slideshow.running) {
-            overlay_info.slideshow.textContent = `${CRT.slideshow.speed}s 🍎`
+        if (!State.slideshow.running) {
+            overlay_info.slideshow.textContent = `${State.slideshow.speed}s 🍎`
             return
         }
 
-        if (_speed !== CRT.slideshow.speed) {
-            total = CRT.slideshow.speed * 1000
-            _speed = CRT.slideshow.speed
-            overlay_info.slideshow.textContent = `${CRT.slideshow.speed}s 🍏`
+        if (_speed !== State.slideshow.speed) {
+            total = State.slideshow.speed * 1000
+            _speed = State.slideshow.speed
+            overlay_info.slideshow.textContent = `${State.slideshow.speed}s 🍏`
         }
 
         progress = performance.now() - start
 
-        CRT.slideshow.pos = (100 / total) * progress
-        slideshow_bar.style.width = CRT.slideshow.pos + '%'
+        State.slideshow.pos = (100 / total) * progress
+        slideshow_bar.style.width = State.slideshow.pos + '%'
 
         // restart
         if (progress > total) {
