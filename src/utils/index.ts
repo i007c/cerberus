@@ -1,4 +1,5 @@
 export * from './base'
+export * from './favorite'
 export * from './options'
 export * from './video'
 export * from './zoom'

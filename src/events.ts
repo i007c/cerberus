@@ -17,6 +17,7 @@ import {
     change_content,
     search,
     slideshow,
+    toggle_favorite_post,
     toggle_fullscreen,
     update_autocomplete,
     update_server,
@@ -212,7 +213,7 @@ function mode_view(e: KeyboardEvent) {
 
         case 'KeyR':
             e.preventDefault()
-            console.log('add to favs')
+            toggle_favorite_post({ server: State.server.name, ...State.post })
             return
 
         case 'KeyU':
@@ -221,6 +222,9 @@ function mode_view(e: KeyboardEvent) {
             State.server.open_post(State.post.id)
             return
     }
+
+    const get_favs = async () =>
+        (await chrome.storage.local.get('favorite_list')).favorite_list
 
     switch (e.shiftKey && e.code) {
         case 'KeyF':
@@ -241,6 +245,14 @@ function mode_view(e: KeyboardEvent) {
             chrome.downloads.download({
                 url: State.post.file,
                 conflictAction: 'uniquify',
+            })
+            return
+
+        case 'KeyR':
+            e.preventDefault()
+            get_favs().then(list => {
+                console.log(list)
+                navigator.clipboard.writeText(JSON.stringify(list))
             })
             return
     }

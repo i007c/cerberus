@@ -45,16 +45,11 @@ const Main = {
                     from: PUBLIC_DIR,
                     to: DIST_DIR,
                 },
-                {
-                    from: resolve(BASE_DIR, 'local'),
-                    to: resolve(DIST_DIR, 'local'),
-                },
             ],
         }),
         new HtmlPlugin({
             template: resolve(SRC_DIR, 'index.html'),
             minify: false,
-            // filename: resolve(DIST_DIR, 'index.html')
         }),
     ],
     resolve: {
