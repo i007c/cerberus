@@ -21,6 +21,7 @@ interface StateModel {
         y: number
         speed: number
     }
+    favorite_list: number[]
 }
 
 type ModeDataModel = {

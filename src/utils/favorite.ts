@@ -1,24 +1,43 @@
-import { PostModel } from 'types'
+import { overlay_info } from 'elements'
+import { State } from 'globals'
 
-interface FavPost extends PostModel {
-    server: string
-}
+async function load_favorite_list(server: string) {
+    let db = await chrome.storage.local.get('favorite_lists')
 
-async function toggle_favorite_post(post: FavPost) {
-    let db = await chrome.storage.local.get('favorite_list')
-
-    if (db.favorite_list === undefined) {
-        await chrome.storage.local.set({ favorite_list: [post] })
+    if (db.favorite_lists === undefined) {
+        State.favorite_list = []
+        await chrome.storage.local.set({ favorite_lists: { [server]: [] } })
         return
     }
 
-    let list: FavPost[] = db.favorite_list
+    if (db.favorite_lists[server] === undefined) {
+        State.favorite_list = []
+        await chrome.storage.local.set({
+            favorite_lists: {
+                ...db.favorite_lists,
+                [server]: [],
+            },
+        })
+        return
+    }
+
+    State.favorite_list = db.favorite_lists[server]
+}
+
+async function toggle_favorite_post(server: string, post_id: number) {
+    let db = await chrome.storage.local.get('favorite_lists')
+
+    if (
+        db.favorite_lists === undefined ||
+        db.favorite_lists[server] === undefined
+    ) {
+        return
+    }
+
     let deleted = false
 
-    list = list.filter(p => {
-        if (typeof p !== 'object') return false
-
-        if (p.id === post.id && p.server === post.server) {
+    State.favorite_list = State.favorite_list.filter(pid => {
+        if (pid === post_id) {
             deleted = true
             return false
         }
@@ -26,9 +45,19 @@ async function toggle_favorite_post(post: FavPost) {
         return true
     })
 
-    if (!deleted) list.push(post)
+    if (!deleted) {
+        State.favorite_list.push(post_id)
+        overlay_info.id.innerText = `${post_id} 🩷`
+    } else {
+        overlay_info.id.innerText = `${post_id}`
+    }
 
-    await chrome.storage.local.set({ favorite_list: list })
+    await chrome.storage.local.set({
+        favorite_lists: {
+            ...db.favorite_lists,
+            [server]: State.favorite_list,
+        },
+    })
 }
 
-export { toggle_favorite_post }
+export { toggle_favorite_post, load_favorite_list }

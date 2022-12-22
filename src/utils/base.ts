@@ -124,7 +124,9 @@ function update_overlay_info() {
         State.posts.length
     } | ${State.page}`
 
-    overlay_info.id.innerText = POST.id.toString()
+    overlay_info.id.innerText = `${POST.id}${
+        State.favorite_list.includes(POST.id) ? ' 🩷' : ''
+    }`
 
     if (POST.score === -1) {
         overlay_info.score.style.display = 'none'

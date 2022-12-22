@@ -15,6 +15,7 @@ import { SERVERS, State } from 'globals'
 import { Mode, ModeDataModel } from 'types'
 import {
     change_content,
+    load_favorite_list,
     search,
     slideshow,
     toggle_favorite_post,
@@ -213,7 +214,7 @@ function mode_view(e: KeyboardEvent) {
 
         case 'KeyR':
             e.preventDefault()
-            toggle_favorite_post({ server: State.server.name, ...State.post })
+            toggle_favorite_post(State.server.name, State.post.id)
             return
 
         case 'KeyU':
@@ -224,7 +225,7 @@ function mode_view(e: KeyboardEvent) {
     }
 
     const get_favs = async () =>
-        (await chrome.storage.local.get('favorite_list')).favorite_list
+        (await chrome.storage.local.get('favorite_lists')).favorite_lists
 
     switch (e.shiftKey && e.code) {
         case 'KeyF':
@@ -430,7 +431,7 @@ function setup_events() {
     server_opt.addEventListener('change', () => {
         // @ts-ignore
         State.server = SERVERS[server_opt.value]
-        console.log(State.server)
+        load_favorite_list(State.server.name)
     })
 
     plate_video.addEventListener('volumechange', () => {
@@ -467,6 +468,7 @@ function setup_events() {
 function init() {
     // @ts-ignore
     State.server = SERVERS[server_opt.value]
+    load_favorite_list(State.server.name)
 
     overlay_info.slideshow.textContent = `${State.slideshow.speed}s 🍎`
     plate_video.volume = 0.3

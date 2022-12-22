@@ -21,6 +21,7 @@ var State: StateModel = {
         y: 1,
         speed: 10,
     },
+    favorite_list: [],
 }
 
 const SERVERS = {
