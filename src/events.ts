@@ -370,9 +370,9 @@ function mode_zoom(e: KeyboardEvent) {
 }
 
 function zoom_setup() {
-    if (!State.post || State.post.type === 'video') return
+    if (!State.post || State.post.type === 'video' || !plate_image.complete)
+        return update_mode('V')
 
-    if (plate_image.naturalWidth < 1 || plate_image.naturalHeight < 1) return
     plate_zoomed.parentElement!.style.display = ''
 
     if (plate_image.naturalWidth > plate_image.naturalHeight) {
