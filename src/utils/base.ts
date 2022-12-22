@@ -149,6 +149,7 @@ function update_overlay_info() {
     POST.tags.forEach(tag => {
         let el = document.createElement('span')
         el.innerText = tag
+        el.onclick = () => navigator.clipboard.writeText(tag)
         overlay_info.tags.appendChild(el)
     })
 }
