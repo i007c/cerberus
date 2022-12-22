@@ -4,6 +4,7 @@ import { IMAGE_EXT, Parser, update_tags, VIDEO_EXT } from './shared'
 var ACAC = new AbortController()
 
 const realbooru: ServerModel = {
+    name: 'realbooru',
     rating_table: {
         q: 'questionable',
         e: 'explicit',
@@ -71,6 +72,7 @@ const realbooru: ServerModel = {
                 has_children: post.getAttribute('has_children') === 'true',
                 tags: post.getAttribute('tags')!.trim().split(' '),
                 rating: <Rating>this.rating_table[rating_key],
+                ext,
             })
         })
 

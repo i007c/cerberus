@@ -7,7 +7,6 @@ import {
     slideshow_bar,
     tags_input,
     timeline_bar,
-    volume_bar,
 } from 'elements'
 import { State } from 'globals'
 import { AutoCompleteTag } from 'types'
@@ -89,7 +88,6 @@ function render_content() {
     if (State.post.type === 'video') {
         plate_image.style.display = 'none'
         plate_video.style.display = ''
-        volume_bar.parentElement!.style.display = ''
         timeline_bar.style.display = ''
 
         plate_video.src = State.post.file
@@ -98,11 +96,15 @@ function render_content() {
 
     plate_video.style.display = 'none'
     plate_video.src = ''
-    volume_bar.parentElement!.style.display = 'none'
     timeline_bar.style.display = 'none'
     plate_image.style.display = ''
 
     plate_image.src = State.post.sample
+    plate_image.onerror = () => {
+        if (!State.post) return
+        plate_image.onerror = null
+        plate_image.src = State.post.file
+    }
 
     if (!plate_image.complete) State.slideshow.running = false
 

@@ -47,9 +47,11 @@ interface PostModel {
     has_children: boolean
     tags: string[]
     rating: Rating
+    ext: string
 }
 
 interface ServerModel {
+    name: string
     rating_table: { [k: string]: Rating }
     autocomplete: null | ((query: string) => Promise<AutoCompleteTag[]>)
     search: (tags: string, page: number) => Promise<PostModel[]>

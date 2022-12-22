@@ -31,6 +31,7 @@ const TAGS_TABLE = {
 var ACAC = new AbortController()
 
 const yandere: ServerModel = {
+    name: 'yandere',
     rating_table: {
         q: 'questionable',
         e: 'explicit',
@@ -81,6 +82,8 @@ const yandere: ServerModel = {
         data = data.filter(({ score }) => score !== null)
 
         return data.map(item => {
+            const ext = item.file_url.split('.').at(-1) || 'png'
+
             return {
                 type: 'image',
                 id: item.id,
@@ -92,6 +95,7 @@ const yandere: ServerModel = {
                 parent_id: item.parent_id,
                 // ------
                 has_children: item.has_children,
+                ext,
             }
         })
     },

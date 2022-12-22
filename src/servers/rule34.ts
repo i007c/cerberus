@@ -10,6 +10,7 @@ interface ACD {
 var ACAC = new AbortController()
 
 const rule34: ServerModel = {
+    name: 'rule34',
     rating_table: {
         q: 'questionable',
         e: 'explicit',
@@ -49,9 +50,15 @@ const rule34: ServerModel = {
 
         if (tags) url += '&tags=' + tags
 
-        const response = await fetch(url)
+        let text
 
-        const text = await response.text()
+        try {
+            const response = await fetch(url)
+            text = await response.text()
+        } catch (error) {
+            return []
+        }
+
         if (!text) return []
 
         const xml = Parser.parseFromString(text, 'text/xml')
@@ -83,6 +90,7 @@ const rule34: ServerModel = {
                 has_children: post.getAttribute('has_children') === 'true',
                 tags: post.getAttribute('tags')!.trim().split(' '),
                 rating: <Rating>this.rating_table[rating_key],
+                ext,
             })
         })
 

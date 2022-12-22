@@ -25,6 +25,8 @@ import {
     update_zoom_pos,
 } from 'utils'
 
+var volume_timeout: NodeJS.Timeout | null = null
+
 const ModeData: ModeDataModel = {
     I: {
         event: mode_insert,
@@ -220,6 +222,29 @@ function mode_view(e: KeyboardEvent) {
             return
     }
 
+    switch (e.shiftKey && e.code) {
+        case 'KeyF':
+            e.preventDefault()
+            if (State.post.type === 'image') {
+                plate_image.src = ''
+                plate_image.src = State.post.file
+            }
+            return
+
+        case 'KeyN':
+            e.preventDefault()
+            open(State.post.file)
+            return
+
+        case 'KeyB':
+            e.preventDefault()
+            chrome.downloads.download({
+                url: State.post.file,
+                conflictAction: 'uniquify',
+            })
+            return
+    }
+
     if (State.post.type !== 'video') return
 
     switch (!e.ctrlKey && !e.shiftKey && e.code) {
@@ -326,6 +351,10 @@ function mode_zoom(e: KeyboardEvent) {
             toggle_fullscreen(plate)
             return
 
+        case 'KeyQ':
+            update_mode('V')
+            return
+
         case 'Minus':
         case 'Digit1':
             return update_zoom_level(-0.5)
@@ -341,6 +370,8 @@ function mode_zoom(e: KeyboardEvent) {
 }
 
 function zoom_setup() {
+    if (!State.post || State.post.type === 'video') return
+
     if (plate_image.naturalWidth < 1 || plate_image.naturalHeight < 1) return
     plate_zoomed.parentElement!.style.display = ''
 
@@ -391,9 +422,17 @@ function setup_events() {
     })
 
     plate_video.addEventListener('volumechange', () => {
+        if (volume_timeout) clearTimeout(volume_timeout)
+        volume_bar.parentElement!.style.display = ''
+
         volume_bar.style.height = plate_video.volume * 100 + '%'
         if (plate_video.muted) volume_bar.style.backgroundColor = '#fd5e00'
         else volume_bar.style.backgroundColor = '#fd0079'
+
+        volume_timeout = setTimeout(
+            () => (volume_bar.parentElement!.style.display = 'none'),
+            1000
+        )
     })
 
     plate_video.addEventListener('timeupdate', () => {
