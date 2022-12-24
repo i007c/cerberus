@@ -136,6 +136,20 @@
         border: 2px solid #143fb4;
     }
 
+    .local-file::file-selector-button {
+        background-color: #111;
+        border: 2px solid #143fb4;
+        color: #fff;
+        font-size: 18px;
+        border-radius: 7px;
+        padding: 0.1rem 0.4rem;
+        cursor: pointer;
+
+        &:focus {
+            outline: 0;
+        }
+    }
+
     &.active {
         .inner-info {
             box-shadow: 0 0 10px #143fb4;

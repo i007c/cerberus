@@ -1,6 +1,7 @@
 import {
     info_tab,
     inp_sort_score,
+    local_file,
     overlay_info,
     plate,
     plate_image,
@@ -16,6 +17,7 @@ import { Mode, ModeDataModel } from 'types'
 import {
     change_content,
     load_favorite_list,
+    load_from_local,
     search,
     slideshow,
     toggle_favorite_post,
@@ -462,6 +464,12 @@ function setup_events() {
         timeline_bar.style.backgroundColor = '#0351c1'
         let pr = (100 / plate_video.duration) * plate_video.currentTime
         timeline_bar.style.width = pr + '%'
+    })
+
+    local_file.addEventListener('change', async () => {
+        const file = local_file.files && local_file.files[0]
+        if (!file || file.type !== 'application/json') return
+        load_from_local(JSON.parse(await file.text()))
     })
 }
 

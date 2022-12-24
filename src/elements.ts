@@ -25,6 +25,10 @@ const slideshow_bar = content_tab.querySelector<HTMLDivElement>(
 const server_opt = info_tab.querySelector<HTMLSelectElement>('select.server')!
 const cache_posts = document.querySelector<HTMLDivElement>('#under_ground')!
 
+const local_file = info_tab.querySelector<HTMLInputElement>(
+    'input[type="file"].local-file'
+)!
+
 const OIS = content_tab.querySelector<HTMLDivElement>('.overlay_info')!
 
 const overlay_info = {
@@ -42,7 +46,7 @@ const overlay_info = {
 }
 
 export { overlay_info, tags_container, cache_posts }
-export { server_opt, tags_input, autocomplete }
+export { server_opt, tags_input, autocomplete, local_file }
 export { volume_bar, timeline_bar, slideshow_bar }
 export { plate, plate_image, plate_video, plate_zoomed, plate_context }
 export { content_tab, info_tab, inp_sort_score }

@@ -52,6 +52,11 @@ function update_autocomplete(tags: AutoCompleteTag[]) {
 }
 
 async function search() {
+    if (State.isLocal) {
+        State.posts = []
+        State.isLocal = false
+    }
+
     let L_POSTS = await State.server.search(tags_input.value, State.page)
 
     if (L_POSTS.length === 0 && State.page > 0) {
@@ -162,29 +167,40 @@ async function change_content(movement: number) {
         return
     }
 
-    let bf_idx = State.index
+    const bf_idx = State.index
 
     State.index += movement
 
     if (State.index >= State.posts.length) {
-        State.page++
         State.index = 0
-        search()
-        return
-    } else if (State.index < 0) {
-        if (State.page > 0) {
-            State.page--
-            State.posts = await State.server.search(
-                tags_input.value,
-                State.page
-            )
-            State.index = State.posts.length - 1
-            render_content()
+
+        if (!State.isLocal) {
+            State.page++
+            search()
             return
         }
-        State.index = 0
-        search()
-        return
+    }
+
+    if (State.index < 0) {
+        State.index = State.posts.length - 1
+
+        if (!State.isLocal) {
+            State.index = 0
+
+            if (State.page > 0) {
+                State.page--
+                State.posts = await State.server.search(
+                    tags_input.value,
+                    State.page
+                )
+                State.index = State.posts.length - 1
+                render_content()
+                return
+            }
+
+            search()
+            return
+        }
     }
 
     if (bf_idx !== State.index) {
@@ -210,7 +226,7 @@ async function cache_content(signal: AbortSignal) {
         if (signal.aborted) break
 
         let c_id = State.index + i
-        if (c_id >= State.posts.length) {
+        if (c_id >= State.posts.length && !State.isLocal) {
             State.page++
             let L_POSTS = await State.server.search(
                 tags_input.value,

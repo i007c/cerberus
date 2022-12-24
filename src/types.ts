@@ -22,6 +22,7 @@ interface StateModel {
         speed: number
     }
     favorite_list: number[]
+    isLocal: boolean
 }
 
 type ModeDataModel = {

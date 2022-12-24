@@ -22,6 +22,7 @@ var State: StateModel = {
         speed: 10,
     },
     favorite_list: [],
+    isLocal: false,
 }
 
 const SERVERS = {
