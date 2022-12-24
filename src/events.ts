@@ -331,6 +331,11 @@ function mode_options(e: KeyboardEvent) {
         case 'KeyI':
             e.preventDefault()
             return update_mode('I')
+
+        case 'KeyF':
+            e.preventDefault()
+            local_file.click()
+            return update_mode('V')
     }
 }
 
@@ -363,7 +368,29 @@ function mode_zoom(e: KeyboardEvent) {
 
         case 'KeyF':
             e.preventDefault()
-            toggle_fullscreen(plate)
+            if (e.shiftKey) {
+                if (State.post && State.post.type === 'image') {
+                    plate_image.src = ''
+                    plate_image.src = State.post.file
+                    plate_image.onload = () => {
+                        if (
+                            plate_image.naturalWidth > plate_image.naturalHeight
+                        ) {
+                            plate_zoomed.width =
+                                (plate_image.naturalHeight * 16) / 9
+                            plate_zoomed.height = plate_image.naturalHeight
+                        } else {
+                            plate_zoomed.width = plate_image.naturalWidth
+                            plate_zoomed.height =
+                                (plate_image.naturalWidth * 9) / 16
+                        }
+
+                        update_zoom_level(1)
+                    }
+                }
+            } else {
+                toggle_fullscreen(plate)
+            }
             return
 
         case 'KeyQ':
