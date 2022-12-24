@@ -23,6 +23,7 @@ interface StateModel {
     }
     favorite_list: number[]
     isLocal: boolean
+    original: boolean
 }
 
 type ModeDataModel = {

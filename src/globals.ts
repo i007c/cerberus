@@ -23,6 +23,7 @@ var State: StateModel = {
     },
     favorite_list: [],
     isLocal: false,
+    original: false,
 }
 
 const SERVERS = {

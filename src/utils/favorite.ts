@@ -25,6 +25,8 @@ async function load_favorite_list(server: string) {
 }
 
 async function toggle_favorite_post(server: string, post_id: number) {
+    if (State.isLocal) return
+
     let db = await chrome.storage.local.get('favorite_lists')
 
     if (

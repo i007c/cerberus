@@ -104,7 +104,9 @@ function render_content() {
     timeline_bar.style.display = 'none'
     plate_image.style.display = ''
 
-    plate_image.src = State.post.sample
+    if (State.original) plate_image.src = State.post.file
+    else plate_image.src = State.post.sample
+
     plate_image.onerror = () => {
         if (!State.post) return
         plate_image.onerror = null
@@ -124,6 +126,8 @@ function render_content() {
 function update_overlay_info() {
     let POST = State.post
     if (!POST) return
+
+    overlay_info.self.style.borderColor = State.original ? '#143fb4' : '#b40a1b'
 
     overlay_info.index.innerText = `${State.index + 1}/${
         State.posts.length
@@ -247,7 +251,8 @@ async function cache_content(signal: AbortSignal) {
         if (item.type !== 'image') continue
 
         let c_img = document.createElement('img')
-        c_img.src = item.sample
+        if (State.original) c_img.src = item.file
+        else c_img.src = item.sample
 
         // c_img.onload = () => console.log(`image ${c_id} loaded`)
         // c_img.onerror = () => console.log(`image ${c_id} error`)

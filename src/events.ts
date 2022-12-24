@@ -23,6 +23,7 @@ import {
     toggle_favorite_post,
     toggle_fullscreen,
     update_autocomplete,
+    update_overlay_info,
     update_server,
     update_video_time,
     update_zoom_level,
@@ -224,6 +225,12 @@ function mode_view(e: KeyboardEvent) {
             if (!State.post) return
             State.server.open_post(State.post.id)
             return
+
+        case 'KeyY':
+            e.preventDefault()
+            State.original = !State.original
+            update_overlay_info()
+            return
     }
 
     const get_favs = async () =>
@@ -340,7 +347,9 @@ function mode_options(e: KeyboardEvent) {
 }
 
 function mode_zoom(e: KeyboardEvent) {
-    switch (e.code) {
+    if (!State.post || State.post.type !== 'image') return
+
+    switch (!e.shiftKey && e.code) {
         case 'KeyD':
             return update_zoom_pos('x', +State.zoom.speed)
 
@@ -366,28 +375,22 @@ function mode_zoom(e: KeyboardEvent) {
             State.zoom.speed = 10
             return
 
+        case 'KeyT':
+            e.preventDefault()
+            if (overlay_info.self.style.display)
+                overlay_info.self.style.display = ''
+            else overlay_info.self.style.display = 'none'
+            return
+
+        case 'KeyY':
+            e.preventDefault()
+            State.original = !State.original
+            update_overlay_info()
+            return
+
         case 'KeyF':
             e.preventDefault()
             if (e.shiftKey) {
-                if (State.post && State.post.type === 'image') {
-                    plate_image.src = ''
-                    plate_image.src = State.post.file
-                    plate_image.onload = () => {
-                        if (
-                            plate_image.naturalWidth > plate_image.naturalHeight
-                        ) {
-                            plate_zoomed.width =
-                                (plate_image.naturalHeight * 16) / 9
-                            plate_zoomed.height = plate_image.naturalHeight
-                        } else {
-                            plate_zoomed.width = plate_image.naturalWidth
-                            plate_zoomed.height =
-                                (plate_image.naturalWidth * 9) / 16
-                        }
-
-                        update_zoom_level(1)
-                    }
-                }
             } else {
                 toggle_fullscreen(plate)
             }
@@ -409,14 +412,43 @@ function mode_zoom(e: KeyboardEvent) {
         case 'Digit0':
             return update_zoom_level(1, true)
     }
+
+    switch ((e.shiftKey, e.code)) {
+        // content movement
+        case 'KeyD':
+            e.preventDefault()
+            change_content(+1)
+            zoom_redraw()
+            return
+
+        case 'KeyA':
+            e.preventDefault()
+            change_content(-1)
+            zoom_redraw()
+            return
+
+        case 'KeyW':
+            e.preventDefault()
+            change_content(+10)
+            zoom_redraw()
+            return
+
+        case 'KeyS':
+            e.preventDefault()
+            change_content(-10)
+            zoom_redraw()
+            return
+
+        case 'KeyF':
+            e.preventDefault()
+            plate_image.src = ''
+            plate_image.src = State.post.file
+            zoom_redraw()
+            return
+    }
 }
 
-function zoom_setup() {
-    if (!State.post || State.post.type === 'video' || !plate_image.complete)
-        return update_mode('V')
-
-    plate_zoomed.parentElement!.style.display = ''
-
+function zoom_update_size() {
     if (plate_image.naturalWidth > plate_image.naturalHeight) {
         plate_zoomed.width = (plate_image.naturalHeight * 16) / 9
         plate_zoomed.height = plate_image.naturalHeight
@@ -425,7 +457,25 @@ function zoom_setup() {
         plate_zoomed.height = (plate_image.naturalWidth * 9) / 16
     }
 
-    update_zoom_level(1, true)
+    State.zoom.speed = Math.round(
+        (plate_image.naturalWidth + plate_image.naturalHeight) / 200
+    )
+
+    update_zoom_level(0)
+}
+
+function zoom_redraw() {
+    if (!State.post || State.post.type === 'video') return update_mode('V')
+
+    if (!plate_image.complete) plate_image.onload = zoom_update_size
+    else zoom_update_size()
+}
+
+function zoom_setup() {
+    if (!State.post || State.post.type === 'video') return update_mode('V')
+
+    plate_zoomed.parentElement!.style.display = ''
+    zoom_redraw()
 }
 
 function setup_events() {
