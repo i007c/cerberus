@@ -222,7 +222,7 @@ function mode_view(e: KeyboardEvent) {
 
         case 'KeyU':
             e.preventDefault()
-            if (!State.post) return
+            if (!State.post || State.isLocal) return
             State.server.open_post(State.post.id)
             return
 
