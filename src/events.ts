@@ -382,6 +382,17 @@ function mode_zoom(e: KeyboardEvent) {
             else overlay_info.self.style.display = 'none'
             return
 
+        case 'KeyV':
+            e.preventDefault()
+            if (overlay_info.tags.style.display) {
+                overlay_info.tags.style.display = ''
+                overlay_info.isr.style.flexDirection = 'row'
+            } else {
+                overlay_info.tags.style.display = 'none'
+                overlay_info.isr.style.flexDirection = 'column'
+            }
+            return
+
         case 'KeyY':
             e.preventDefault()
             State.original = !State.original
@@ -458,7 +469,7 @@ function zoom_update_size() {
     }
 
     State.zoom.speed = Math.round(
-        (plate_image.naturalWidth + plate_image.naturalHeight) / 200
+        (plate_image.naturalWidth + plate_image.naturalHeight) / 100
     )
 
     update_zoom_level(0)

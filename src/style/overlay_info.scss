@@ -1,8 +1,9 @@
 .overlay_info {
-    // cursor: auto;
+    cursor: auto;
+    pointer-events: all;
+
     z-index: 1;
     max-width: 69%;
-    // pointer-events: all;
     background-color: #111;
     position: fixed;
     bottom: 0;
