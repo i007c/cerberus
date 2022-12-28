@@ -4,6 +4,6 @@ keyboard orianted imageboard viewer **Cerberus**
 
 ## Todos
 
-* [ ] add danbooru, gelbooru and realbooru servers
-* [ ] add image zoom system
-* [ ] tabable autocomplete
+* [ ] add the danbooru server
+* [x] add image zoom system
+* [x] tabable autocomplete
