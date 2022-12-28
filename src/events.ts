@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import {
     info_tab,
     inp_sort_score,
@@ -93,7 +95,8 @@ function mode_insert(e: KeyboardEvent) {
 
         case 'Enter':
             e.preventDefault()
-            search()
+            State.end_page = false
+            search(true)
             update_mode('V')
             update_autocomplete([])
             return
@@ -318,7 +321,8 @@ function mode_options(e: KeyboardEvent) {
     switch (e.code) {
         case 'Enter':
             e.preventDefault()
-            search()
+            State.end_page = false
+            search(true)
             update_mode('V')
             return
 
@@ -526,7 +530,7 @@ function setup_events() {
 
     plate_video.addEventListener('volumechange', () => {
         if (volume_timeout) clearTimeout(volume_timeout)
-        volume_bar.parentElement!.style.display = ''
+        if (plate_video.src) volume_bar.parentElement!.style.display = ''
 
         volume_bar.style.height = plate_video.volume * 100 + '%'
         if (plate_video.muted) volume_bar.style.backgroundColor = '#fd5e00'

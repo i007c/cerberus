@@ -32,6 +32,7 @@ var ACAC = new AbortController()
 
 const yandere: ServerModel = {
     name: 'yandere',
+    limit: 500,
     rating_table: {
         q: 'questionable',
         e: 'explicit',
@@ -66,7 +67,9 @@ const yandere: ServerModel = {
     search: async function (tags, page) {
         ACAC.abort()
         tags = update_tags(tags, 'order:score')
-        let url = 'https://yande.re/post.json?limit=100&page=' + (page + 1)
+        let url = `https://yande.re/post.json?limit=${this.limit}&page=${
+            page + 1
+        }`
 
         if (tags) url += '&tags=' + tags
 

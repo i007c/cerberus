@@ -51,22 +51,30 @@ function update_autocomplete(tags: AutoCompleteTag[]) {
     })
 }
 
-async function search() {
+async function search(replace = false) {
     if (State.isLocal) {
         State.posts = []
         State.isLocal = false
     }
 
+    if (State.end_page) return
+
     let L_POSTS = await State.server.search(tags_input.value, State.page)
 
-    if (L_POSTS.length === 0 && State.page > 0) {
+    if (L_POSTS.length === 0) {
         State.page--
-        State.posts = await State.server.search(tags_input.value, State.page)
-        State.index = State.posts.length - 1
-    } else {
+        State.end_page = true
+        return
+    }
+
+    if (replace) {
         State.posts = L_POSTS
         State.index = 0
+    } else {
+        State.posts.concat(L_POSTS)
+        State.index++
     }
+
     render_content()
 }
 
@@ -178,7 +186,7 @@ async function change_content(movement: number) {
     if (State.index >= State.posts.length) {
         State.index = 0
 
-        if (!State.isLocal) {
+        if (!State.isLocal && !State.end_page) {
             State.page++
             search()
             return
@@ -188,23 +196,23 @@ async function change_content(movement: number) {
     if (State.index < 0) {
         State.index = State.posts.length - 1
 
-        if (!State.isLocal) {
-            State.index = 0
+        // if (!State.isLocal) {
+        //     State.index = 0
 
-            if (State.page > 0) {
-                State.page--
-                State.posts = await State.server.search(
-                    tags_input.value,
-                    State.page
-                )
-                State.index = State.posts.length - 1
-                render_content()
-                return
-            }
+        //     if (State.page > 0) {
+        //         State.page--
+        //         State.posts = await State.server.search(
+        //             tags_input.value,
+        //             State.page
+        //         )
+        //         State.index = State.posts.length - 1
+        //         render_content()
+        //         return
+        //     }
 
-            search()
-            return
-        }
+        //     search()
+        //     return
+        // }
     }
 
     if (bf_idx !== State.index) {
@@ -230,21 +238,21 @@ async function cache_content(signal: AbortSignal) {
         if (signal.aborted) break
 
         let c_id = State.index + i
-        if (c_id >= State.posts.length && !State.isLocal) {
-            State.page++
-            let L_POSTS = await State.server.search(
-                tags_input.value,
-                State.page
-            )
+        // if (c_id >= State.posts.length && !State.isLocal) {
+        //     State.page++
+        //     let L_POSTS = await State.server.search(
+        //         tags_input.value,
+        //         State.page
+        //     )
 
-            if (L_POSTS.length === 0) {
-                State.page--
-                break
-            }
+        //     if (L_POSTS.length === 0) {
+        //         State.page--
+        //         break
+        //     }
 
-            State.posts = State.posts.concat(L_POSTS)
-            update_overlay_info()
-        }
+        //     State.posts = State.posts.concat(L_POSTS)
+        //     update_overlay_info()
+        // }
 
         let item = State.posts[c_id]
         if (!item) break
@@ -309,4 +317,4 @@ function slideshow() {
 
 export { update_autocomplete, search, toggle_fullscreen }
 export { render_content, update_overlay_info, change_content }
-export { cache_content, slideshow }
+export { slideshow }

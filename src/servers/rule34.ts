@@ -11,6 +11,7 @@ var ACAC = new AbortController()
 
 const rule34: ServerModel = {
     name: 'rule34',
+    limit: 500,
     rating_table: {
         q: 'questionable',
         e: 'explicit',
@@ -45,7 +46,7 @@ const rule34: ServerModel = {
     search: async function (tags, page) {
         ACAC.abort()
         tags = update_tags(tags, 'sort:score')
-        let url = 'https://api.rule34.xxx/index.php?page=dapi&s=post'
+        let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&limit=${this.limit}`
         url += '&q=index&pid=' + page
 
         if (tags) url += '&tags=' + tags

@@ -1,4 +1,7 @@
-import 'style/index.scss'
-import { setup_events } from './events'
+import { setup_keybinds } from 'keybinding'
+// import { setup_events } from './events'
 
-setup_events()
+import 'style/index.scss'
+
+// setup_events()
+setup_keybinds()

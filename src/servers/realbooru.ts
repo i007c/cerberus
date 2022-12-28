@@ -5,6 +5,7 @@ var ACAC = new AbortController()
 
 const realbooru: ServerModel = {
     name: 'realbooru',
+    limit: 500,
     rating_table: {
         q: 'questionable',
         e: 'explicit',
@@ -33,7 +34,7 @@ const realbooru: ServerModel = {
     search: async function (tags, page) {
         ACAC.abort()
         tags = update_tags(tags, 'sort:score')
-        let url = 'https://realbooru.com/index.php?page=dapi&s=post'
+        let url = `https://realbooru.com/index.php?page=dapi&s=post&limit=${this.limit}`
         url += '&q=index&pid=' + page
 
         if (tags) url += '&tags=' + tags

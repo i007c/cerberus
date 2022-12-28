@@ -24,6 +24,7 @@ interface PD {
 
 const gelbooru: ServerModel = {
     name: 'gelbooru',
+    limit: 100,
     autocomplete: async query => {
         ACAC.abort()
         ACAC = new AbortController()

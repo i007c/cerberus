@@ -24,11 +24,12 @@ interface StateModel {
     favorite_list: number[]
     isLocal: boolean
     original: boolean
+    end_page: boolean
 }
 
 type ModeDataModel = {
     [k in Mode]: {
-        event: (e: KeyboardEvent) => void
+        // event: (e: KeyboardEvent) => void
         setup?: () => void
         clean?: () => void
     }
@@ -55,6 +56,7 @@ interface PostModel {
 
 interface ServerModel {
     name: string
+    limit: number
     rating_table: { [k: string]: Rating }
     autocomplete: null | ((query: string) => Promise<AutoCompleteTag[]>)
     search: (tags: string, page: number) => Promise<PostModel[]>
