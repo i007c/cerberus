@@ -18,6 +18,8 @@ const volume_bar =
     content_tab.querySelector<HTMLDivElement>('div.volume > div')!
 const timeline_bar =
     content_tab.querySelector<HTMLDivElement>('div.timeline > div')!
+const loading_bar =
+    content_tab.querySelector<HTMLDivElement>('div.loading > div')!
 const slideshow_bar = content_tab.querySelector<HTMLDivElement>(
     'div.slideshow_bar > div'
 )!
@@ -47,6 +49,6 @@ const overlay_info = {
 
 export { overlay_info, tags_container, cache_posts }
 export { server_opt, tags_input, autocomplete, local_file }
-export { volume_bar, timeline_bar, slideshow_bar }
+export { volume_bar, timeline_bar, slideshow_bar, loading_bar }
 export { plate, plate_image, plate_video, plate_zoomed, plate_context }
 export { content_tab, info_tab, inp_sort_score }

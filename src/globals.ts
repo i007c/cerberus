@@ -1,6 +1,9 @@
 import { gelbooru, realbooru, rule34, yandere } from 'servers'
 import { StateModel } from 'types'
 
+const EMPTY_IMAGE =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+Q8AAQ0BBYgRfXMAAAAASUVORK5CYII='
+
 var State: StateModel = {
     tab: 'info',
     slideshow: {
@@ -25,6 +28,7 @@ var State: StateModel = {
     isLocal: false,
     original: false,
     end_page: false,
+    ActiveKeys: {},
 }
 
 const SERVERS = {
@@ -35,4 +39,4 @@ const SERVERS = {
     realbooru: realbooru,
 }
 
-export { State, SERVERS }
+export { State, SERVERS, EMPTY_IMAGE }

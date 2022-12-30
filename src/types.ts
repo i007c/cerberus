@@ -25,6 +25,7 @@ interface StateModel {
     isLocal: boolean
     original: boolean
     end_page: boolean
+    ActiveKeys: { [k: string]: string }
 }
 
 type ModeDataModel = {
@@ -63,5 +64,16 @@ interface ServerModel {
     open_post: (post_id: string | number) => void
 }
 
+interface ActionModel {
+    title: string
+    description?: string
+    func: ActionFunc
+    // prevent_default?: false
+    // stop_propagation?: false
+}
+
+type ActionFunc = (e: KeyboardEvent, args: unknown[]) => void
+type ActionBind = string | [string, unknown]
+
 export { StateModel, AutoCompleteTag, PostModel, Rating, ServerModel }
-export { Mode, ModeDataModel }
+export { Mode, ModeDataModel, ActionFunc, ActionBind, ActionModel }

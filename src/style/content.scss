@@ -62,7 +62,8 @@
             }
         }
 
-        .timeline {
+        .timeline,
+        .loading {
             --height: 3px;
             position: absolute;
             overflow: hidden;
@@ -71,12 +72,20 @@
             bottom: 0;
             display: flex;
             align-items: flex-end;
+            z-index: 1;
 
             > div {
                 height: 100%;
                 width: 0%;
-                background-color: #0351c1;
             }
+        }
+
+        .timeline > div {
+            background-color: #0351c1;
+        }
+
+        .loading > div {
+            background-color: #008736;
         }
 
         .zoom-map {

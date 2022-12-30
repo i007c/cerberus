@@ -10,6 +10,7 @@ import {
 } from 'elements'
 import { State } from 'globals'
 import { AutoCompleteTag } from 'types'
+import { update_plate_image } from './loader'
 
 var CACHE_CTRL: AbortController | null = null
 
@@ -112,13 +113,13 @@ function render_content() {
     timeline_bar.style.display = 'none'
     plate_image.style.display = ''
 
-    if (State.original) plate_image.src = State.post.file
-    else plate_image.src = State.post.sample
+    if (State.original) update_plate_image(State.post.file)
+    else update_plate_image(State.post.sample)
 
     plate_image.onerror = () => {
         if (!State.post) return
         plate_image.onerror = null
-        plate_image.src = State.post.file
+        update_plate_image(State.post.file)
     }
 
     if (!plate_image.complete) State.slideshow.running = false

@@ -11,6 +11,15 @@
         "default_popup": "popup/popup.html"
     },
 
+    "commands": {
+        "_execute_action": {
+            "suggested_key": {
+                "default": "Ctrl+B"
+            },
+            "description": "open a new Cerberus tab."
+        }
+    },
+
     "incognito": "split",
 
     "icons": {
@@ -31,7 +40,7 @@
         "https://danbooru.donmai.us/*",
         "https://*.gelbooru.com/*",
         "https://*.rule34.xxx/*",
-        "https://yande.re/*",
+        "https://*.yande.re/*",
         "https://*.realbooru.com/*"
     ],
     "declarative_net_request": {
