@@ -74,6 +74,7 @@ var KeyBinds: KBT = {
     'Z-KeyY-0-0-0-0': 'toggle_load_original',
     'Z-KeyF-0-0-0-0': 'toggle_fullscreen',
     'Z-KeyQ-0-0-0-0': 'set_mode_v',
+    'Z-KeyU-0-0-0-0': 'open_current_post',
 
     'Z-Minus-0-0-0-0': ['change_zoom_level', -1],
     'Z-Digit1-0-0-0-0': ['change_zoom_level', -1],
