@@ -55,13 +55,14 @@ interface PostModel {
     ext: string
 }
 
-interface ServerModel {
+type ServerModel = {
     name: string
     limit: number
     rating_table: { [k: string]: Rating }
     autocomplete: null | ((query: string) => Promise<AutoCompleteTag[]>)
     search: (tags: string, page: number) => Promise<PostModel[]>
     open_post: (post_id: string | number) => void
+    sync_favs?: (local_favs: number[]) => Promise<number[]>
 }
 
 interface ActionModel {

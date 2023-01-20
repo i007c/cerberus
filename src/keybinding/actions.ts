@@ -130,6 +130,7 @@ const Actions: { [k: string]: ActionModel } = {
         title: 'open current post',
         func: () => {
             if (!State.post || State.isLocal) return
+            State.ActiveKeys = {}
             State.server.open_post(State.post.id)
         },
     },
@@ -151,6 +152,7 @@ const Actions: { [k: string]: ActionModel } = {
     open_original: {
         title: 'open original',
         func: () => {
+            State.ActiveKeys = {}
             if (State.post) open(State.post.file)
         },
     },
@@ -158,6 +160,7 @@ const Actions: { [k: string]: ActionModel } = {
         title: 'download original',
         func: () => {
             if (!State.post) return
+            State.ActiveKeys = {}
             chrome.downloads.download({
                 url: State.post.file,
                 conflictAction: 'uniquify',

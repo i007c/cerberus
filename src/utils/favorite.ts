@@ -7,10 +7,7 @@ async function load_favorite_list(server: string) {
     if (db.favorite_lists === undefined) {
         State.favorite_list = []
         await chrome.storage.local.set({ favorite_lists: { [server]: [] } })
-        return
-    }
-
-    if (db.favorite_lists[server] === undefined) {
+    } else if (db.favorite_lists[server] === undefined) {
         State.favorite_list = []
         await chrome.storage.local.set({
             favorite_lists: {
@@ -18,10 +15,11 @@ async function load_favorite_list(server: string) {
                 [server]: [],
             },
         })
-        return
+    } else {
+        State.favorite_list = db.favorite_lists[server]
     }
 
-    State.favorite_list = db.favorite_lists[server]
+    if (State.server.sync_favs) State.server.sync_favs(State.favorite_list)
 }
 
 async function toggle_favorite_post(server: string, post_id: number) {

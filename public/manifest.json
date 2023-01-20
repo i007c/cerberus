@@ -32,9 +32,9 @@
     "permissions": [
         "unlimitedStorage",
         "storage",
-        "webRequest",
         "declarativeNetRequestWithHostAccess",
-        "downloads"
+        "downloads",
+        "cookies"
     ],
     "host_permissions": [
         "https://danbooru.donmai.us/*",
@@ -46,9 +46,9 @@
     "declarative_net_request": {
         "rule_resources": [
             {
-                "id": "ruleset_header_referer",
-                "enabled": false,
-                "path": "rules_header_referer.json"
+                "id": "ruleset_header",
+                "enabled": true,
+                "path": "ruleset_header.json"
             }
         ]
     }
