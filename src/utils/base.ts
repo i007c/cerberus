@@ -80,6 +80,7 @@ async function search(replace = false) {
 }
 
 function capitalize(text: string) {
+    if (typeof text !== 'string') return 'ITE'
     return text.charAt(0).toUpperCase() + text.slice(1)
 }
 

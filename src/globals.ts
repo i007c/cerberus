@@ -19,7 +19,7 @@ var State: StateModel = {
     mode: 'V',
     autocomplete: null,
     zoom: {
-        level: 1,
+        level: 10,
         x: 1,
         y: 1,
         speed: 10,

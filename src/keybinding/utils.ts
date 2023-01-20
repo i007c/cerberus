@@ -68,9 +68,9 @@ function zoom_update_size() {
         plate_zoomed.height = (plate_image.naturalWidth * 9) / 16
     }
 
-    State.zoom.speed = Math.round(
-        (plate_image.naturalWidth + plate_image.naturalHeight) / 100
-    )
+    // State.zoom.speed = Math.round(
+    //     (plate_image.naturalWidth + plate_image.naturalHeight) / 100
+    // )
 
     update_zoom_level(0)
 }

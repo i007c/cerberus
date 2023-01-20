@@ -8,8 +8,8 @@ function draw() {
         plate_image,
         State.zoom.x,
         State.zoom.y,
-        plate_zoomed.width / State.zoom.level,
-        plate_zoomed.height / State.zoom.level,
+        (plate_zoomed.width * 10) / State.zoom.level,
+        (plate_zoomed.height * 10) / State.zoom.level,
         0,
         0,
         plate_zoomed.width,
@@ -18,30 +18,31 @@ function draw() {
 }
 
 function update_zoom_pos(dir: 'x' | 'y', movement: number, dddd = true) {
+    // if (State.zoom.level < 10) movement = movement * -1
+
     if (dir === 'x') {
-        State.zoom.x += movement / State.zoom.level
-        let max_x =
-            plate_image.naturalWidth - plate_zoomed.width / State.zoom.level
+        State.zoom.x += (movement * 10) / State.zoom.level
 
-        if (State.zoom.x < 0) State.zoom.x = 0
+        const max_x = plate_image.naturalWidth - 20
+        const min_x = (plate_zoomed.width * -10) / State.zoom.level + 20
 
+        if (State.zoom.x < min_x) State.zoom.x = min_x
         if (State.zoom.x > max_x) State.zoom.x = max_x
     } else if (dir === 'y') {
-        State.zoom.y += movement / State.zoom.level
-        let max_y =
-            plate_image.naturalHeight - plate_zoomed.height / State.zoom.level
+        State.zoom.y += (movement * 10) / State.zoom.level
 
-        if (State.zoom.y < 0) State.zoom.y = 0
+        const max_y = plate_image.naturalHeight - 20
+        const min_y = (plate_zoomed.height * -10) / State.zoom.level + 20
 
+        if (State.zoom.y < min_y) State.zoom.y = min_y
         if (State.zoom.y > max_y) State.zoom.y = max_y
     }
 
     if (dddd) draw()
 }
 
-function update_zoom_level(movement: number, set = false) {
-    if (set) State.zoom.level = movement
-    else State.zoom.level += movement
+function update_zoom_level(movement: number) {
+    State.zoom.level += movement
 
     if (State.zoom.level < 1) State.zoom.level = 1
 

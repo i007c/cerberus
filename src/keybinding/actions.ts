@@ -279,6 +279,12 @@ const Actions: { [k: string]: ActionModel } = {
             if ((axis !== 'x' && axis !== 'y') || typeof dir !== 'number')
                 return
 
+            if (args[2]) {
+                State.zoom[axis] = dir
+                update_zoom_pos(axis, 0)
+                return
+            }
+
             update_zoom_pos(axis, dir * State.zoom.speed)
         },
     },
@@ -300,6 +306,17 @@ const Actions: { [k: string]: ActionModel } = {
             if (State.zoom.speed < 1) State.zoom.speed = 1
         },
     },
+    set_zoom_comic: {
+        title: 'set zoom to comic view',
+        func: () => {
+            if (!State.post || State.post.type !== 'image') return
+
+            State.zoom.level = 10
+            State.zoom.x = 0
+
+            update_zoom_level(0)
+        },
+    },
     change_zoom_level: {
         title: 'change zoom level',
         func: (_, args) => {
@@ -309,7 +326,12 @@ const Actions: { [k: string]: ActionModel } = {
 
             if (typeof level !== 'number') return
 
-            update_zoom_level(level, !!args[1])
+            if (args[1]) {
+                State.zoom.level = level
+                update_zoom_level(0)
+            } else {
+                update_zoom_level(level)
+            }
         },
     },
 }

@@ -15,18 +15,6 @@ import { load_favorite_list, load_from_local, update_autocomplete } from 'utils'
 
 var volume_timeout: NodeJS.Timeout | null = null
 
-// const get_favs = async () =>
-//     (await chrome.storage.local.get('favorite_lists')).favorite_lists
-// switch (e.shiftKey && e.code) {
-//     case 'KeyR':
-//         e.preventDefault()
-//         get_favs().then(list => {
-//             console.log(list)
-//             navigator.clipboard.writeText(JSON.stringify(list))
-//         })
-//         return
-// }
-
 function setup_events() {
     init()
 
