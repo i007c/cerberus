@@ -18,8 +18,6 @@ async function load_favorite_list(server: string) {
     } else {
         State.favorite_list = db.favorite_lists[server]
     }
-
-    if (State.server.sync_favs) State.server.sync_favs(State.favorite_list)
 }
 
 async function toggle_favorite_post(server: string, post_id: number) {

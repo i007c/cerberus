@@ -62,7 +62,6 @@ type ServerModel = {
     autocomplete: null | ((query: string) => Promise<AutoCompleteTag[]>)
     search: (tags: string, page: number) => Promise<PostModel[]>
     open_post: (post_id: string | number) => void
-    sync_favs?: (local_favs: number[]) => Promise<number[]>
 }
 
 interface ActionModel {
