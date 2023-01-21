@@ -10,6 +10,9 @@ const SRC_DIR = resolve(BASE_DIR, 'src')
 const PUBLIC_DIR = resolve(BASE_DIR, 'public')
 const DIST_DIR = resolve(BASE_DIR, 'dist')
 
+CopyPlugin
+PUBLIC_DIR
+
 const Main = {
     entry: SRC_DIR,
     output: {
@@ -48,7 +51,7 @@ const Main = {
             ],
         }),
         new HtmlPlugin({
-            template: resolve(SRC_DIR, 'index.html'),
+            template: resolve(SRC_DIR, 'template.html'),
             minify: false,
         }),
     ],
@@ -58,10 +61,20 @@ const Main = {
             new TsPaths({ configFile: resolve(SRC_DIR, 'tsconfig.json') }),
         ],
     },
-    optimization: {
-        emitOnErrors: false,
-        chunkIds: 'deterministic',
-        minimize: true,
+    // optimization: {
+    //     emitOnErrors: false,
+    //     chunkIds: 'deterministic',
+    //     minimize: true,
+    // },
+    devServer: {
+        port: 8000,
+        hot: true, // true = full reload
+        historyApiFallback: true,
+        compress: true,
+        client: {
+            logging: 'none',
+            reconnect: 7,
+        },
     },
 }
 
