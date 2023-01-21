@@ -1,21 +1,25 @@
+import { Zoom } from 'components'
+import { useAtomValue } from 'jotai'
 import React, { FC } from 'react'
+import { PostAtom } from 'state'
 
 const Content: FC = () => {
+    const Post = useAtomValue(PostAtom)
+
     return (
         <div className='content' tabIndex={0}>
             <div className='plate' tabIndex={0}>
-                <img className='main' style={{ display: 'none' }} />
-                <video
-                    className='main'
-                    style={{ display: 'none' }}
-                    autoPlay
-                ></video>
+                {Post.type === 'video' ? (
+                    <video className='main' autoPlay src={Post.file}></video>
+                ) : (
+                    <img className='main' src={Post.file} />
+                )}
 
-                <div className='volume'>
+                <div className='volume' style={{ display: 'none' }}>
                     <div></div>
                 </div>
 
-                <div className='timeline'>
+                <div className='timeline' style={{ display: 'none' }}>
                     <div></div>
                 </div>
 
@@ -37,13 +41,11 @@ const Content: FC = () => {
                     <div className='tags' style={{ display: 'none' }}></div>
                 </div>
 
-                <div className='slideshow_bar'>
+                <div className='slideshow_bar' style={{ display: 'none' }}>
                     <div></div>
                 </div>
 
-                <div className='zoomed-container'>
-                    <canvas className='zoomed'></canvas>
-                </div>
+                <Zoom />
             </div>
         </div>
     )
