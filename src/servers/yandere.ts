@@ -1,7 +1,5 @@
 import { update_tags } from './shared'
 
-import { ServerModel } from 'types'
-
 interface ACD {
     name: string
     type: string

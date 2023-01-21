@@ -1,4 +1,3 @@
-import { ServerModel } from 'types'
 import { IMAGE_EXT, update_tags, VIDEO_EXT } from './shared'
 
 var ACAC = new AbortController()

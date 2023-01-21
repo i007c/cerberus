@@ -1,4 +1,3 @@
-import { PostModel, Rating, ServerModel } from 'types'
 import { IMAGE_EXT, Parser, update_tags, VIDEO_EXT } from './shared'
 
 interface ACD {
@@ -65,7 +64,7 @@ const rule34: ServerModel = {
         const xml = Parser.parseFromString(text, 'text/xml')
         const posts = xml.querySelector('posts')!
         const posts_list = posts.querySelectorAll('post')
-        const data: PostModel[] = []
+        const data: Post[] = []
 
         posts_list.forEach(post => {
             const file = post.getAttribute('file_url')!
@@ -85,7 +84,7 @@ const rule34: ServerModel = {
                 type,
                 score: parseInt(post.getAttribute('score')!),
                 file: file,
-                parent_id: parseInt(post.getAttribute('parent_id')!),
+                parent: parseInt(post.getAttribute('parent_id')!),
                 sample: post.getAttribute('sample_url')!,
                 id: parseInt(post.getAttribute('id')!),
                 has_children: post.getAttribute('has_children') === 'true',

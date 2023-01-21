@@ -1,9 +1,6 @@
-import { State } from 'globals'
-import { ActionBind } from 'types'
-import { get_action, key_to_idx } from './utils'
-
 type KBT = { [k: string]: ActionBind }
-var KeyBinds: KBT = {
+
+const KeyBinds: KBT = {
     // MODE-KEY-ALT-CTRL-META-SHIFT
 
     // global actions
@@ -91,6 +88,14 @@ var KeyBinds: KBT = {
     'Z-KeyF-0-0-0-1': 'load_original',
 }
 
+export * from './actions'
+export { KeyBinds }
+
+/* import { State } from 'globals'
+import { ActionBind } from 'types'
+import { get_action, key_to_idx } from './utils'
+
+
 function setup_keybinds() {
     document.addEventListener('keydown', e => {
         State.ActiveKeys[e.code] = key_to_idx(e)
@@ -116,3 +121,4 @@ function setup_keybinds() {
 }
 
 export { setup_keybinds }
+ */

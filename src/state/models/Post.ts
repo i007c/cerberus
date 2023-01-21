@@ -1,16 +1,10 @@
-type Rating = 'questionable' | 'safe' | 'explicit'
-
-type Post = {
-    type: 'image' | 'video' | 'gif'
-    id: number
-    parent?: number
-    has_children: boolean
-    tags: string[]
-    rating: Rating
-    ext: string
-    score: number
-    file: string
-    sample: string
+type PostState = {
+    page: number
+    index: number
+    post: Post
+    posts: Post[]
+    server: ServerModel
+    autocomplete: string | null
 }
 
-export { Post as PostModel, Rating }
+export { PostState as PostStateModel }

@@ -11,15 +11,15 @@ const Content: FC = () => {
     return (
         <div className='content' tabIndex={0}>
             <div className='plate' tabIndex={0}>
-                {Post.type === 'video' ? (
+                {Post.post.type === 'video' ? (
                     <video
                         className='main'
                         // autoPlay
-                        src={Post.file}
+                        src={Post.post.file}
                         controls
                     ></video>
                 ) : (
-                    <img className='main' src={Post.file} />
+                    <img className='main' src={Post.post.file} />
                 )}
 
                 <div className='volume' style={{ display: 'none' }}>

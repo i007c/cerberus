@@ -1,4 +1,3 @@
-import { PostModel, Rating, ServerModel } from 'types'
 import { IMAGE_EXT, Parser, update_tags, VIDEO_EXT } from './shared'
 
 var ACAC = new AbortController()
@@ -47,7 +46,7 @@ const realbooru: ServerModel = {
         const xml = Parser.parseFromString(text, 'text/xml')
         const posts = xml.querySelector('posts')!
         const posts_list = posts.querySelectorAll('post')
-        const data: PostModel[] = []
+        const data: Post[] = []
 
         posts_list.forEach(post => {
             const file = post.getAttribute('file_url')!
@@ -67,7 +66,7 @@ const realbooru: ServerModel = {
                 type,
                 score: -1,
                 file: file,
-                parent_id: null,
+                
                 sample: post.getAttribute('sample_url')!,
                 id: parseInt(post.getAttribute('id')!),
                 has_children: post.getAttribute('has_children') === 'true',
