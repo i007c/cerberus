@@ -1,9 +1,8 @@
-import TsPaths from 'tsconfig-paths-webpack-plugin'
 // import { Configuration } from 'webpack'
 import CopyPlugin from 'copy-webpack-plugin'
 import HtmlPlugin from 'html-webpack-plugin'
-
 import { resolve } from 'path'
+import TsPaths from 'tsconfig-paths-webpack-plugin'
 
 const BASE_DIR = __dirname
 const SRC_DIR = resolve(BASE_DIR, 'src')
@@ -30,7 +29,7 @@ const Main = {
                 use: 'ts-loader',
             },
             {
-                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                test: /\.(png|svg|jpg|jpeg|gif|mp4)$/i,
                 type: 'asset/resource',
             },
             {

@@ -1,7 +1,9 @@
-import { Zoom } from 'components'
-import { useAtomValue } from 'jotai'
 import React, { FC } from 'react'
+
+import { useAtomValue } from 'jotai'
 import { PostAtom } from 'state'
+
+import { Zoom } from 'components'
 
 const Content: FC = () => {
     const Post = useAtomValue(PostAtom)
@@ -10,7 +12,12 @@ const Content: FC = () => {
         <div className='content' tabIndex={0}>
             <div className='plate' tabIndex={0}>
                 {Post.type === 'video' ? (
-                    <video className='main' autoPlay src={Post.file}></video>
+                    <video
+                        className='main'
+                        // autoPlay
+                        src={Post.file}
+                        controls
+                    ></video>
                 ) : (
                     <img className='main' src={Post.file} />
                 )}

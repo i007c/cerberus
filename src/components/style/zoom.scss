@@ -1,11 +1,13 @@
 .content .zoomed-container {
     position: absolute;
-    inset: 0;
-    // width: 50%;
-    // bottom: 0;
-    // left: 0;
-    // border-top: 2px solid red;
-    // border-right: 2px solid red;
+    // inset: 0;
+    //
+    width: 50%;
+    top: 0;
+    left: 0;
+    border-bottom: 2px solid red;
+    border-right: 2px solid red;
+    //
     background-color: #040404;
     display: flex;
     justify-content: center;
@@ -13,6 +15,10 @@
 
     .zoomed {
         width: 100%;
-        aspect-ratio: 16/9;
+        // aspect-ratio: 16/9;
+    }
+
+    img {
+        display: none;
     }
 }
