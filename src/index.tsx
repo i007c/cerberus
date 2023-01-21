@@ -3,8 +3,14 @@ import { createRoot } from 'react-dom/client'
 
 import './style/index.scss'
 
+import Info from 'layout/info'
+
 const App: FC = () => {
-    return <div>gg</div>
+    return (
+        <>
+            <Info />
+        </>
+    )
 }
 
 const container = document.getElementById('root')!

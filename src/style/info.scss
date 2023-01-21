@@ -3,7 +3,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    pointer-events: none;
 
     .inner-info {
         width: 80%;
@@ -128,7 +127,6 @@
 
     .server {
         width: 80%;
-        // pointer-events: all;
         background-color: #111;
         color: #ddd;
         font-size: 22px;
