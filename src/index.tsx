@@ -3,11 +3,13 @@ import { createRoot } from 'react-dom/client'
 
 import './style/index.scss'
 
-import Info from 'layout/info'
+import Content from 'layout/Content'
+import Info from 'layout/Info'
 
 const App: FC = () => {
     return (
         <>
+            <Content />
             <Info />
         </>
     )
