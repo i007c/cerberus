@@ -10,6 +10,7 @@ import {
 } from 'elements'
 import { State } from 'globals'
 import { AutoCompleteTag } from 'types'
+
 import { update_plate_image } from './loader'
 
 var CACHE_CTRL: AbortController | null = null
@@ -82,14 +83,6 @@ async function search(replace = false) {
 function capitalize(text: string) {
     if (typeof text !== 'string') return 'ITE'
     return text.charAt(0).toUpperCase() + text.slice(1)
-}
-
-function toggle_fullscreen(el: HTMLElement) {
-    if (document.fullscreenElement === el) {
-        document.exitFullscreen()
-    } else {
-        el.requestFullscreen()
-    }
 }
 
 function render_content() {
@@ -175,63 +168,7 @@ function update_overlay_info() {
     })
 }
 
-async function change_content(movement: number) {
-    if (State.posts.length === 0) {
-        State.index = 0
-        return
-    }
-
-    const bf_idx = State.index
-
-    State.index += movement
-
-    if (State.index >= State.posts.length) {
-        State.index = 0
-
-        if (!State.isLocal && !State.end_page) {
-            State.page++
-            search()
-            return
-        }
-    }
-
-    if (State.index < 0) {
-        State.index = State.posts.length - 1
-
-        // if (!State.isLocal) {
-        //     State.index = 0
-
-        //     if (State.page > 0) {
-        //         State.page--
-        //         State.posts = await State.server.search(
-        //             tags_input.value,
-        //             State.page
-        //         )
-        //         State.index = State.posts.length - 1
-        //         render_content()
-        //         return
-        //     }
-
-        //     search()
-        //     return
-        // }
-    }
-
-    if (bf_idx !== State.index) {
-        State.slideshow.pos = 0
-        slideshow_bar.style.width = '0%'
-        timeline_bar.style.width = '0%'
-
-        if (State.slideshow.running) {
-            State.slideshow.running = false
-            setTimeout(() => {
-                slideshow()
-            }, 500)
-        }
-
-        render_content()
-    }
-}
+async function change_content(movement: number) {}
 
 async function cache_content(signal: AbortSignal) {
     cache_posts.innerHTML = ''
@@ -317,6 +254,6 @@ function slideshow() {
     requestAnimationFrame(anime)
 }
 
-export { update_autocomplete, search, toggle_fullscreen }
+export { update_autocomplete, search }
 export { render_content, update_overlay_info, change_content }
 export { slideshow }

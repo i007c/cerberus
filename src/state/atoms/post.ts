@@ -1,12 +1,12 @@
 import { yandere } from 'servers'
 
 import { atom } from 'jotai'
-import { PostStateModel } from 'state'
+import { PostModel, PostsModel } from 'state'
 
 import img from 'static/patrick.jpg'
 import video from 'static/sample.mp4'
 
-const IMAGE_POST: Post = {
+const IMAGE_POST: PostModel = {
     type: 'image',
     ext: 'jpg',
     file: img,
@@ -16,9 +16,10 @@ const IMAGE_POST: Post = {
     rating: 'safe',
     score: 10000000,
     tags: ['patrick'],
+    link: 'google.com',
 }
 
-const VIDEO_POST: Post = {
+const VIDEO_POST: PostModel = {
     type: 'video',
     ext: 'mp4',
     file: video,
@@ -28,25 +29,34 @@ const VIDEO_POST: Post = {
     rating: 'questionable',
     score: 6991,
     tags: ['dr_stop'],
+    link: 'google.com',
 }
 
 IMAGE_POST
 const DEFAULT_POST = VIDEO_POST
 
-const Post = atom<PostStateModel>({
+const Post = atom<PostModel | null>(DEFAULT_POST)
+
+const PostAtom = atom(
+    get => get(Post),
+    (_, set, args: PostModel | null) => {
+        set(Post, args)
+    }
+)
+
+const Posts = atom<PostsModel>({
     page: 0,
     index: 0,
-    post: DEFAULT_POST,
     posts: [],
     server: yandere,
     autocomplete: null,
 })
 
-const PostAtom = atom(
-    get => get(Post),
-    (get, set, args: Partial<PostStateModel>) => {
-        set(Post, { ...get(Post), ...args })
+const PostsAtom = atom(
+    get => get(Posts),
+    (get, set, args: Partial<PostsModel>) => {
+        set(Posts, { ...get(Posts), ...args })
     }
 )
 
-export { PostAtom }
+export { PostAtom, PostsAtom }

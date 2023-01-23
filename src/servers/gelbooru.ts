@@ -1,3 +1,5 @@
+import { ServerModel } from 'state'
+
 import { IMAGE_EXT, update_tags, VIDEO_EXT } from './shared'
 
 var ACAC = new AbortController()
@@ -81,13 +83,10 @@ const gelbooru: ServerModel = {
                 parent_id: post.parent_id === 0 ? null : post.parent_id,
                 score: post.score,
                 tags: post.tags.split(' '),
+                link: `https://gelbooru.com/index.php?page=post&s=view&id=${post.id}`,
             }
         })
     },
-    open_post: post_id => {
-        open(`https://gelbooru.com/index.php?page=post&s=view&id=${post_id}`)
-    },
-    rating_table: {},
 }
 
 export { gelbooru }

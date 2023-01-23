@@ -3,7 +3,7 @@ const VIDEO_EXT = ['mp4', 'webm']
 const Parser = new DOMParser()
 
 const update_tags = (tags: string, ss_tag: string) => {
-    if (GlobalState.sort_score && ss_tag) tags += ' ' + ss_tag
+    if (general.sort_score && ss_tag) tags += ' ' + ss_tag
 
     return tags
 }

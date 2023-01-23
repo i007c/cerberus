@@ -48,8 +48,3 @@ function zoom_redraw() {
 
 export { key_to_idx, update_mode, get_action, get_movement, zoom_redraw }
  */
-
-const get_movement = (args: ActionArg[]): number =>
-    typeof args[0] === 'number' ? args[0] : 1
-
-export { get_movement }
