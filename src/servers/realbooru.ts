@@ -1,5 +1,19 @@
+import { IMAGE_EXT, update_tags, VIDEO_EXT } from './shared'
 import { PostModel, Rating, ServerModel } from 'types'
-import { IMAGE_EXT, Parser, update_tags, VIDEO_EXT } from './shared'
+
+type JPost = {
+    directory: string
+    hash: string
+    height: number
+    id: number
+    image: string
+    parent_id: number
+    rating: Rating
+    sample: number
+    score: null
+    tags: string
+    width: number
+}
 
 var ACAC = new AbortController()
 
@@ -35,27 +49,26 @@ const realbooru: ServerModel = {
         ACAC.abort()
         tags = update_tags(tags, 'sort:score')
         let url = `https://realbooru.com/index.php?page=dapi&s=post&limit=${this.limit}`
-        url += '&q=index&pid=' + page
+        url += '&json=1&q=index&pid=' + page
 
         if (tags) url += '&tags=' + tags
 
         const response = await fetch(url)
 
-        const text = await response.text()
-        if (!text) return []
+        const json: JPost[] = await response.json()
+        // if (!text) return []
 
-        const xml = Parser.parseFromString(text, 'text/xml')
-        const posts = xml.querySelector('posts')!
-        const posts_list = posts.querySelectorAll('post')
+        // const xml = Parser.parseFromString(text, 'text/xml')
+        // const posts = xml.querySelector('posts')!
+        // const posts_list = posts.querySelectorAll('post')
         const data: PostModel[] = []
 
-        posts_list.forEach(post => {
-            const file = post.getAttribute('file_url')!
+        json.forEach(post => {
+            // const file = post.getAttribute('file_url')!
+            const file = post.image
 
             const ext = file.split('.').at(-1) || 'png'
             let type: 'image' | 'video' = 'image'
-
-            const rating_key = <'q' | 's' | 'e'>post.getAttribute('rating')
 
             if (VIDEO_EXT.includes(ext)) {
                 type = 'video'
@@ -66,13 +79,13 @@ const realbooru: ServerModel = {
             data.push({
                 type,
                 score: -1,
-                file: file,
-                parent_id: null,
-                sample: post.getAttribute('sample_url')!,
-                id: parseInt(post.getAttribute('id')!),
-                has_children: post.getAttribute('has_children') === 'true',
-                tags: post.getAttribute('tags')!.trim().split(' '),
-                rating: <Rating>this.rating_table[rating_key],
+                file: `https://realbooru.com/images/${post.directory}/${post.image}`,
+                parent_id: post.parent_id,
+                sample: `https://realbooru.com/images/${post.directory}/${post.image}`,
+                id: post.id,
+                has_children: false,
+                tags: post.tags.trim().split(' '),
+                rating: post.rating,
                 ext,
             })
         })
