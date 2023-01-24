@@ -1,57 +1,19 @@
 import {
-    autocomplete,
     cache_posts,
     overlay_info,
     plate_image,
     plate_video,
     slideshow_bar,
     tags_input,
-    timeline_bar,
+    timeline_bar
 } from 'elements'
 import { State } from 'globals'
-import { AutoCompleteTag } from 'types'
 
 import { update_plate_image } from './loader'
 
 var CACHE_CTRL: AbortController | null = null
 
-function update_autocomplete(tags: AutoCompleteTag[]) {
-    let last_tag = tags_input.value.split(' ').at(-1)
 
-    if (tags.length === 0 || !last_tag) {
-        autocomplete.style.display = 'none'
-        State.autocomplete = null
-        return
-    }
-
-    autocomplete.style.display = ''
-    autocomplete.innerHTML = ''
-
-    State.autocomplete = tags[0] ? tags[0].name : null
-
-    tags.forEach(tag => {
-        const item = document.createElement('li')
-        item.className = tag.type
-
-        const name = document.createElement('span')
-        const count = document.createElement('span')
-
-        name.className = 'name'
-        count.className = 'count'
-
-        name.innerHTML = tag.name.replace(
-            new RegExp(last_tag || ''),
-            match => `<mark>${match}</mark>`
-        )
-        if (tag.count === -1) count.innerText = ''
-        else count.innerText = tag.count.toLocaleString()
-
-        item.appendChild(name)
-        item.appendChild(count)
-
-        autocomplete.appendChild(item)
-    })
-}
 
 async function search(replace = false) {
     if (State.isLocal) {
@@ -80,16 +42,13 @@ async function search(replace = false) {
     render_content()
 }
 
-function capitalize(text: string) {
-    if (typeof text !== 'string') return 'ITE'
-    return text.charAt(0).toUpperCase() + text.slice(1)
-}
+
 
 function render_content() {
     if (State.posts.length === 0) return
 
     State.post = State.posts[State.index]!
-    update_overlay_info()
+
 
     timeline_bar.style.width = '0%'
 
@@ -126,47 +85,7 @@ function render_content() {
     if (CACHE_CTRL) cache_content(CACHE_CTRL.signal)
 }
 
-function update_overlay_info() {
-    let POST = State.post
-    if (!POST) return
 
-    overlay_info.self.style.borderColor = State.original ? '#143fb4' : '#b40a1b'
-
-    overlay_info.index.innerText = `${State.index + 1}/${
-        State.posts.length
-    } | ${State.page}`
-
-    overlay_info.id.innerText = `${POST.id}${
-        State.favorite_list.includes(POST.id) ? ' 🩷' : ''
-    }`
-
-    if (POST.score === -1) {
-        overlay_info.score.style.display = 'none'
-    } else {
-        overlay_info.score.innerText = POST.score.toString()
-        overlay_info.score.style.display = ''
-    }
-
-    if (POST.parent_id) {
-        overlay_info.parent.style.display = ''
-        overlay_info.parent.innerText = `parent: ${POST.parent_id}`
-    } else {
-        overlay_info.parent.innerText = ''
-        overlay_info.parent.style.display = 'none'
-    }
-
-    overlay_info.rating.innerText = capitalize(POST.rating)
-    overlay_info.rating.className = 'rating ' + POST.rating
-
-    overlay_info.tags.innerHTML = ''
-
-    POST.tags.forEach(tag => {
-        let el = document.createElement('span')
-        el.innerText = tag
-        el.onclick = () => navigator.clipboard.writeText(tag)
-        overlay_info.tags.appendChild(el)
-    })
-}
 
 async function change_content(movement: number) {}
 
@@ -257,3 +176,4 @@ function slideshow() {
 export { update_autocomplete, search }
 export { render_content, update_overlay_info, change_content }
 export { slideshow }
+

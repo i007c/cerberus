@@ -13,12 +13,20 @@ type Post = {
     sample: string
     link: string
     force_original?: boolean
+    is_favorite?: boolean
 }
 
 type AutoCompleteTag = {
     type: string
     name: string
     count: number
+}
+
+type AutoComplete = {
+    tags: AutoCompleteTag[]
+    query: string
+    regQuery: RegExp
+    index: number
 }
 
 type Server = {
@@ -28,19 +36,10 @@ type Server = {
     search: (tags: string, page: number) => Promise<Post[]>
 }
 
-type Posts = {
-    page: number
-    index: number
-
-    posts: Post[]
-    server: Server
-    autocomplete: string | null
-}
-
 export {
-    Posts as PostsModel,
     Post as PostModel,
     Rating,
     Server as ServerModel,
     AutoCompleteTag,
+    AutoComplete as AutoCompleteModel,
 }

@@ -5,22 +5,23 @@ import { toggle_favorite_post } from 'utils'
 import { useAtom } from 'jotai'
 import {
     ActionsAtom,
+    GeneralAtom,
     get_movement,
     KeyBindModel,
+    Mode,
     PostAtom,
-    PostsAtom,
     SlideShowAtom,
 } from 'state'
 
 const KeyBinding: FC = () => {
     const [Actions, register] = useAtom(ActionsAtom)
-    const [PostsState, setPosts] = useAtom(PostsAtom)
+    const [GeneralState, setGeneral] = useAtom(GeneralAtom)
     const [PostState, setPost] = useAtom(PostAtom)
     const [SlideShowState, setSlideShow] = useAtom(SlideShowAtom)
 
     global.Post = PostState
-    global.Posts = PostsState
     global.SlideShow = SlideShowState
+    global.general = GeneralState
 
     useEffect(() => {
         register({
@@ -28,13 +29,19 @@ const KeyBinding: FC = () => {
                 title: 'set or change the mode (V, I, C, ...)',
                 func: (_, args) => {
                     const mode = `${args[0]}`.toUpperCase()
-                    if (check_mode(mode)) general.mode = mode
+                    if (check_mode(mode)) setGeneral({ mode })
                 },
             },
             toggle_favorite_post: {
                 title: 'toggle favorite post',
-                func: () => {
-                    if (Post) toggle_favorite_post(Posts.server.name, Post.id)
+                func: async () => {
+                    if (Post)
+                        setGeneral({
+                            favorite_list: await toggle_favorite_post(
+                                general.server.name,
+                                Post.id
+                            ),
+                        })
                 },
             },
             slideshow_speed: {
@@ -54,18 +61,17 @@ const KeyBinding: FC = () => {
             content_movement: {
                 title: 'go to the next or previous post',
                 func: (_, args) => {
-                    console.log(Posts.posts)
-                    if (Posts.posts.length === 0) {
-                        setPosts({ index: 0 })
+                    if (general.posts.length === 0) {
+                        setGeneral({ index: 0 })
                         setPost(null)
                         return
                     }
 
                     const update = get_movement(args)
-                    let index = Posts.index
+                    let index = general.index
                     index += update
 
-                    if (index >= Posts.posts.length) {
+                    if (index >= general.posts.length) {
                         index = 0
 
                         // if (!general.isLocal && !State.end_page) {
@@ -74,10 +80,10 @@ const KeyBinding: FC = () => {
                         //     return
                         // }
                     } else if (index < 0) {
-                        index = Posts.posts.length - 1
+                        index = general.posts.length - 1
                     }
 
-                    if (index !== Posts.index) {
+                    if (index !== general.index) {
                         setSlideShow({ pos: 0 })
 
                         if (SlideShow.running) {
@@ -102,7 +108,7 @@ const KeyBinding: FC = () => {
                 title: 'toggle load original',
                 description:
                     'the next content loads will load the original file',
-                func: () => (general.original = !general.original),
+                func: () => setGeneral({ original: !general.original }),
             },
             load_original: {
                 title: 'load original file',
@@ -134,7 +140,7 @@ const KeyBinding: FC = () => {
     }, [register])
 
     useEffect(() => {
-        Object.keys(Actions).forEach(key => console.log(key))
+        // Object.keys(Actions).forEach(key => console.log(key))
 
         function keydown(e: KeyboardEvent) {
             ActiveKeys[e.code] =
@@ -242,7 +248,7 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
 
     // insert mode
     'I-Enter-0-0-0-0': [['search', []]],
-    'I-Tab-0-0-0-0': [['tag_autocomplete', []]],
+    'I-Tab-0-0-0-0': [['autocomplete_select', []]],
 
     // copy mode
     'C-KeyI-0-0-0-0': [['copy_post_id', []]],

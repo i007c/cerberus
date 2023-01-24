@@ -96,6 +96,7 @@
         border-radius: 5px;
 
         li {
+            max-width: 500px;
             white-space: nowrap;
             overflow: hidden;
             color: #ddd;
@@ -111,6 +112,7 @@
 
             .count {
                 letter-spacing: -1.5px;
+                flex-shrink: 0;
             }
         }
 

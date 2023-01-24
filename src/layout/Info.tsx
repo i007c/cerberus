@@ -1,28 +1,40 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, Fragment, useEffect, useRef, useState } from 'react'
+
+import { C } from '@00-team/utils'
 
 import { SERVERS } from 'servers'
 import { VIDEO_EXT } from 'servers/shared'
 import { load_favorite_list } from 'utils'
 
-import { useSetAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import {
     ActionsAtom,
+    AutoCompleteAtom,
+    GeneralAtom,
     get_movement,
     PostAtom,
     PostModel,
-    PostsAtom,
 } from 'state'
 
 const Info: FC = () => {
     const register = useSetAtom(ActionsAtom)
-    const setPosts = useSetAtom(PostsAtom)
+    const [ACTS, setAC] = useAtom(AutoCompleteAtom)
+    global.AutoComplete = ACTS
+
     const setPost = useSetAtom(PostAtom)
-    const [state, setState] = useState({
-        sort_score: false,
+    const [GeneralState, setGeneral] = useAtom(GeneralAtom)
+
+    const [state, updateState] = useState({
+        input: [] as string[],
+        ac_index: -1,
     })
+
+    const setState = (args: Partial<typeof state>) =>
+        updateState(s => ({ ...s, ...args }))
 
     const local_file = useRef<HTMLInputElement>(null)
     const server = useRef<HTMLSelectElement>(null)
+    const input = useRef<HTMLTextAreaElement>(null)
 
     useEffect(() => {
         register({
@@ -33,19 +45,16 @@ const Info: FC = () => {
                     document.dispatchEvent(ClearActiveKeys)
 
                     local_file.current.click()
-                    general.mode = 'V'
+                    setGeneral({ mode: 'V' })
                 },
             },
             toggle_sort_score: {
                 title: 'toggle sort score',
-                func: () => {
-                    general.sort_score = !general.sort_score
-                    setState(s => ({ ...s, sort_score: general.sort_score }))
-                },
+                func: () => setGeneral({ sort_score: !general.sort_score }),
             },
             change_server: {
                 title: 'change server',
-                func: (_, args) => {
+                func: async (_, args) => {
                     if (!server.current) return
                     const update = get_movement(args)
                     const servers = Object.values(SERVERS)
@@ -57,36 +66,144 @@ const Info: FC = () => {
                     const new_server = servers[idx]!
 
                     server.current.value = new_server.name
-                    setPosts({ server: new_server })
-                    load_favorite_list(new_server.name)
+                    setGeneral({
+                        server: new_server,
+                        favorite_list: await load_favorite_list(
+                            new_server.name
+                        ),
+                    })
                 },
+            },
+            autocomplete_select: {
+                title: 'select the autocomplete',
+                func: () =>
+                    updateState(state => {
+                        if (
+                            AutoComplete.tags.length < 1 ||
+                            AutoComplete.index === -1 ||
+                            state.ac_index === -1 ||
+                            state.input.length < 1
+                        )
+                            return state
+
+                        let tag = AutoComplete.tags[AutoComplete.index]
+                        setAC({ index: -1, tags: [] })
+
+                        if (!tag) return state
+
+                        const new_state = {
+                            input: state.input.map((stag, idx) => {
+                                if (idx === state.ac_index && tag)
+                                    return tag.name
+                                return stag
+                            }),
+                            ac_index: -1,
+                        }
+
+                        if (input.current)
+                            input.current.value = new_state.input.join(' ')
+
+                        return new_state
+                    }),
             },
         })
     }, [register])
 
+    useEffect(() => {
+        if (!input.current) return
+
+        if (GeneralState.mode === 'I') {
+            input.current.focus()
+        } else {
+            input.current.blur()
+        }
+    }, [GeneralState])
+
     return (
-        <div className='info' tabIndex={0}>
+        <div
+            className={'info' + C(['I', 'O'].includes(GeneralState.mode))}
+            tabIndex={0}
+        >
             <div className='inner-info'>
                 <div className='tags' style={{ display: 'none' }}></div>
                 <textarea
+                    ref={input}
                     tabIndex={0}
-                    onInput={e => {
-                        let last_tag = e.currentTarget.value.split(' ').at(-1)
-                        console.log(last_tag)
-                        // e.currentTarget.value = e.currentTarget.value.replaceAll('\n', '')
+                    onInput={async e => {
+                        let new_tags = e.currentTarget.value
+                            .split(' ')
+                            .filter(v => v)
 
-                        // if (!last_tag || last_tag === '\n') return update_autocomplete([])
+                        let changing = ''
 
-                        // if (State.server.autocomplete) {
-                        //     const data = await State.server.autocomplete(last_tag)
-                        //     update_autocomplete(data)
-                        // }
+                        if (new_tags.length != state.input.length) {
+                            changing = new_tags.at(-1) || ''
+                            let idx = new_tags.indexOf(changing)
+                            setState({
+                                ac_index: idx === undefined ? -1 : idx,
+                            })
+                        } else {
+                            for (let i = 0; i < new_tags.length; i++) {
+                                if (new_tags[i] !== state.input[i]) {
+                                    changing = new_tags[i] || ''
+                                    setState({ ac_index: i })
+                                    break
+                                }
+                            }
+                        }
+
+                        setState({ input: new_tags })
+
+                        if (!GeneralState.server.autocomplete || !changing)
+                            return
+
+                        setAC({
+                            tags: await GeneralState.server.autocomplete(
+                                changing
+                            ),
+                            query: changing,
+                            regQuery: new RegExp(
+                                `(${changing.replace(
+                                    /[.*+?^${}()|[\]\\]/g,
+                                    '\\$&'
+                                )})`,
+                                'gi'
+                            ),
+                        })
                     }}
                 ></textarea>
-                <ul className='autocomplete' style={{ display: 'none' }}></ul>
+                {ACTS.tags.length > 0 && (
+                    <ul className='autocomplete'>
+                        {ACTS.tags.map(({ type, name, count }, idx) => (
+                            <li
+                                className={type + C(ACTS.index === idx)}
+                                key={idx + name}
+                            >
+                                <span className='name'>
+                                    {name
+                                        .split(ACTS.regQuery)
+                                        .map((s, sidx) => (
+                                            <Fragment key={sidx}>
+                                                {s.toLocaleLowerCase() ===
+                                                ACTS.query ? (
+                                                    <mark>{s}</mark>
+                                                ) : (
+                                                    s
+                                                )}
+                                            </Fragment>
+                                        ))}
+                                </span>
+                                <span className='count'>
+                                    {count === -1 ? '' : count.toLocaleString()}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+
                 <div className='checkbox-row'>
                     <input
-                        checked={state.sort_score}
+                        checked={GeneralState.sort_score}
                         type='checkbox'
                         id='sort_score_checkbox'
                         onChange={() => {}}
@@ -98,11 +215,15 @@ const Info: FC = () => {
                     ref={server}
                     className='server'
                     defaultValue='yandere'
-                    onChange={e => {
+                    onChange={async e => {
                         // @ts-ignore
                         const new_server = SERVERS[e.currentTarget.value]
-                        setPosts({ server: new_server })
-                        load_favorite_list(new_server.name)
+                        setGeneral({
+                            server: new_server,
+                            favorite_list: await load_favorite_list(
+                                new_server.name
+                            ),
+                        })
                     }}
                 >
                     {Object.keys(SERVERS).map(key => (
@@ -122,8 +243,6 @@ const Info: FC = () => {
                         if (!file || file.type !== 'application/json') return
 
                         const data = JSON.parse(await file.text())
-
-                        general.isLocal = true
 
                         const posts: PostModel[] = data.favorites.map(
                             (f: any) => ({
@@ -145,7 +264,7 @@ const Info: FC = () => {
                             })
                         )
 
-                        setPosts({ posts })
+                        setGeneral({ isLocal: true, page: 0, posts })
 
                         if (posts[0]) setPost(posts[0])
                     }}

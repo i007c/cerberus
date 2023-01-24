@@ -17,16 +17,6 @@ const App: FC = () => {
     )
 }
 
-global.general = {
-    tab: 'info',
-    favorite_list: [],
-    mode: 'V',
-    end_page: false,
-    sort_score: false,
-    original: false,
-    isLocal: false,
-}
-
 const container = document.getElementById('root')!
 
 createRoot(container).render(<App />)
