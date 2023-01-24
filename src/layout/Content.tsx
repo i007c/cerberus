@@ -8,14 +8,22 @@ import React, {
 } from 'react'
 
 import { useAtomValue, useSetAtom } from 'jotai'
-import { ActionsAtom, get_movement, PostAtom, PostModel } from 'state'
+import {
+    ActionsAtom,
+    GeneralAtom,
+    get_movement,
+    PostAtom,
+    PostModel,
+} from 'state'
 
 import { Zoom } from 'components'
 
 var volume_timeout: NodeJS.Timeout | null = null
+var loader_http: XMLHttpRequest | null = null
 
 const Content: FC = () => {
     const PostState = useAtomValue(PostAtom)
+    // const GeneralState = useAtomValue(GeneralAtom)
     const register = useSetAtom(ActionsAtom)
 
     const video = useRef<HTMLVideoElement>(null)
@@ -30,6 +38,8 @@ const Content: FC = () => {
         show_volume: false,
         overlay_info: false,
         overlay_info_tags: false,
+        image: '',
+        loading: 0,
     })
 
     const setState = (args: Partial<typeof state>) =>
@@ -124,6 +134,40 @@ const Content: FC = () => {
         })
     }, [register])
 
+    useEffect(() => {
+        if (loader_http) loader_http.abort()
+        if (!PostState || PostState.type === 'video') {
+            setState({
+                image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+Q8AAQ0BBYgRfXMAAAAASUVORK5CYII=',
+                loading: 0,
+            })
+            return
+        }
+
+        let url =
+            general.original || !!PostState.force_original
+                ? PostState.file
+                : PostState.sample
+
+        loader_http = new XMLHttpRequest()
+
+        loader_http.open('GET', url, true)
+        loader_http.responseType = 'arraybuffer'
+
+        loader_http.onload = function () {
+            var blob = new Blob([this.response])
+            setState({ loading: 0, image: URL.createObjectURL(blob) })
+        }
+
+        loader_http.onprogress = function (e) {
+            setState({ loading: (e.loaded / e.total) * 100 })
+        }
+
+        loader_http.onloadstart = () => setState({ loading: 0 })
+
+        loader_http.send()
+    }, [PostState])
+
     return (
         <div className='content' tabIndex={0}>
             <div
@@ -142,50 +186,55 @@ const Content: FC = () => {
                         videoRef={video}
                         setState={setState}
                     />
+                ) : PostState ? (
+                    <img ref={image} className='main' src={state.image} />
                 ) : (
-                    <img
-                        ref={image}
-                        className='main'
-                        src={PostState ? PostState.file : ''}
-                    />
+                    // <ImagePlate
+                    //     file={PostState.file}
+                    //     sample={PostState.sample}
+                    //     imageRef={image}
+                    //     original={
+                    //
+                    //     }
+                    // />
+                    <>None</>
                 )}
 
-                <div
-                    className='volume'
-                    style={{ display: state.show_volume ? '' : 'none' }}
-                >
-                    <div
-                        style={{
-                            width: state.video_volume + '%',
-                            backgroundColor: state.video_muted
-                                ? '#fd5e00'
-                                : '#fd0079',
-                        }}
-                    ></div>
-                </div>
+                {state.show_volume && (
+                    <div className='volume'>
+                        <div
+                            style={{
+                                width: state.video_volume + '%',
+                                backgroundColor: state.video_muted
+                                    ? '#fd5e00'
+                                    : '#fd0079',
+                            }}
+                        ></div>
+                    </div>
+                )}
 
-                <div
-                    className='timeline'
-                    style={{
-                        display:
-                            PostState && PostState.type !== 'video'
-                                ? 'none'
-                                : '',
-                    }}
-                >
-                    <div
-                        style={{
-                            width: state.video_timeline + '%',
-                            backgroundColor: state.video_paused
-                                ? '#6E36CA'
-                                : '#0351c1',
-                        }}
-                    ></div>
-                </div>
+                {PostState && PostState.type === 'video' && (
+                    <div className='timeline'>
+                        <div
+                            style={{
+                                width: state.video_timeline + '%',
+                                backgroundColor: state.video_paused
+                                    ? '#6E36CA'
+                                    : '#0351c1',
+                            }}
+                        ></div>
+                    </div>
+                )}
 
-                <div className='loading'>
-                    <div></div>
-                </div>
+                {state.loading !== 0 && (
+                    <div className='loading'>
+                        <div
+                            style={{
+                                width: state.loading + '%',
+                            }}
+                        ></div>
+                    </div>
+                )}
 
                 <OverlayInfo
                     show={state.overlay_info}
@@ -203,13 +252,13 @@ const Content: FC = () => {
     )
 }
 
-type VideoPlateProsp = {
+type VideoPlateProps = {
     file: string
     videoRef: RefObject<HTMLVideoElement>
     setState(args: {}): void
 }
 
-const VideoPlate: FC<VideoPlateProsp> = ({ file, videoRef, setState }) => {
+const VideoPlate: FC<VideoPlateProps> = ({ file, videoRef, setState }) => {
     return (
         <video
             ref={videoRef}
@@ -256,6 +305,26 @@ const VideoPlate: FC<VideoPlateProsp> = ({ file, videoRef, setState }) => {
     )
 }
 
+// type ImagePlateProps = {
+//     file: string
+//     sample: string
+//     imageRef: RefObject<HTMLImageElement>
+//     original: boolean
+// }
+
+// const ImagePlate: FC<ImagePlateProps> = ({
+//     file,
+//     sample,
+//     imageRef,
+//     original,
+// }) => {
+//     // const GeneralState = useAtomValue(GeneralAtom)
+//     console.log(original)
+
+//     return (
+//     )
+// }
+
 type OverlayInfoProps = {
     show: boolean
     show_tags: boolean
@@ -263,10 +332,11 @@ type OverlayInfoProps = {
 }
 
 const OverlayInfo: FC<OverlayInfoProps> = ({ show, show_tags, post }) => {
+    const GeneralState = useAtomValue(GeneralAtom)
     const main_style: CSSProperties = {
         display: show ? '' : 'none',
         borderColor:
-            general.original || (post && post.force_original)
+            GeneralState.original || (post && post.force_original)
                 ? '#143fb4'
                 : '#b40a1b',
     }
@@ -292,8 +362,8 @@ const OverlayInfo: FC<OverlayInfoProps> = ({ show, show_tags, post }) => {
                             {post.rating}
                         </span>
                         <span className='index'>
-                            {general.index + 1}/{general.posts.length} |{' '}
-                            {general.page}
+                            {GeneralState.index + 1}/{GeneralState.posts.length}{' '}
+                            | {GeneralState.page}
                         </span>
                         <span className='slideshow'>N/A</span>
                     </>

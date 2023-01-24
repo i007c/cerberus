@@ -106,6 +106,29 @@ const Info: FC = () => {
                         return new_state
                     }),
             },
+            search: {
+                title: 'search the tags',
+                func: async () => {
+                    if (!input.current) return
+
+                    setAC({ index: -1, tags: [] })
+                    setGeneral({
+                        end_page: false,
+                        mode: 'V',
+                        isLocal: false,
+                        index: 0,
+                        page: 0,
+                    })
+
+                    let new_posts = await general.server.search(
+                        input.current.value,
+                        0
+                    )
+
+                    setGeneral({ posts: new_posts })
+                    setPost(new_posts[0] || null)
+                },
+            },
         })
     }, [register])
 

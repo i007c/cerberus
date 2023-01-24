@@ -4,8 +4,7 @@ import {
     plate_image,
     plate_video,
     slideshow_bar,
-    tags_input,
-    timeline_bar
+    timeline_bar,
 } from 'elements'
 import { State } from 'globals'
 
@@ -13,42 +12,14 @@ import { update_plate_image } from './loader'
 
 var CACHE_CTRL: AbortController | null = null
 
-
-
 async function search(replace = false) {
-    if (State.isLocal) {
-        State.posts = []
-        State.isLocal = false
-    }
-
-    if (State.end_page) return
-
-    let L_POSTS = await State.server.search(tags_input.value, State.page)
-
-    if (L_POSTS.length === 0) {
-        State.page--
-        State.end_page = true
-        return
-    }
-
-    if (replace) {
-        State.posts = L_POSTS
-        State.index = 0
-    } else {
-        State.posts.concat(L_POSTS)
-        State.index++
-    }
-
     render_content()
 }
-
-
 
 function render_content() {
     if (State.posts.length === 0) return
 
     State.post = State.posts[State.index]!
-
 
     timeline_bar.style.width = '0%'
 
@@ -84,10 +55,6 @@ function render_content() {
     CACHE_CTRL = new AbortController()
     if (CACHE_CTRL) cache_content(CACHE_CTRL.signal)
 }
-
-
-
-async function change_content(movement: number) {}
 
 async function cache_content(signal: AbortSignal) {
     cache_posts.innerHTML = ''
@@ -173,7 +140,6 @@ function slideshow() {
     requestAnimationFrame(anime)
 }
 
-export { update_autocomplete, search }
-export { render_content, update_overlay_info, change_content }
+export { search }
+export { render_content }
 export { slideshow }
-

@@ -34,10 +34,7 @@ const v_space: BActionFunc = () => {
     // else slideshow()
 }
 
-const copy = (text: string | number) => {
-    navigator.clipboard.writeText(`${text}`)
-    setGlobalState({ mode: 'V' })
-}
+
 
 // all of the actions
 const Actions: { [k: string]: BActionModel } = {
@@ -49,54 +46,10 @@ const Actions: { [k: string]: BActionModel } = {
 
 
 
-    search: {
-        title: 'search the tags',
-        func: () => {
-            GlobalState.end_page = false
-            // update_autocomplete([])
-            // search(true)
-            setGlobalState({ mode: 'V' })
-        },
-    },
-    tag_autocomplete: {
-        title: 'tag autocomplete',
-        func: () => {
-            // tags_input.focus()
-            // if (State.autocomplete) {
-            //     let tags = tags_input.value.split(' ').slice(0, -1)
-            //     tags.push(State.autocomplete)
-            //     tags_input.value = tags.join(' ')
-            //     tags_input.value += ' '
-            //     update_autocomplete([])
-            // }
-        },
-    },
 
-    copy_post_id: {
-        title: 'copy post id',
-        func: () => {
-            if (!PostState.post) return setGlobalState({ mode: 'V' })
-            copy(PostState.post.id)
-        },
-    },
-    copy_parent_id: {
-        title: 'copy parent id',
-        func: () => {
-            if (!PostState.post) return setGlobalState({ mode: 'V' })
 
-            if (PostState.post.has_children)
-                return copy(`parent:${PostState.post.id}`)
-            if (PostState.post.parent)
-                return copy(`parent:${PostState.post.parent}`)
-        },
-    },
-    copy_tags: {
-        title: 'copy tags',
-        func: () => {
-            if (!PostState.post) return setGlobalState({ mode: 'V' })
-            copy(PostState.post.tags.join(' '))
-        },
-    },
+
+
     change_zoom_pos: {
         title: 'change zoom position',
         func: (_, args) => {

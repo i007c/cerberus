@@ -23,6 +23,11 @@ const KeyBinding: FC = () => {
     global.SlideShow = SlideShowState
     global.general = GeneralState
 
+    const copy = (text: string | number) => {
+        navigator.clipboard.writeText(`${text}`)
+        setGeneral({ mode: 'V' })
+    }
+
     useEffect(() => {
         register({
             set_mode: {
@@ -84,6 +89,8 @@ const KeyBinding: FC = () => {
                     }
 
                     if (index !== general.index) {
+                        setGeneral({ index })
+                        setPost(general.posts[index] || null)
                         setSlideShow({ pos: 0 })
 
                         if (SlideShow.running) {
@@ -134,6 +141,29 @@ const KeyBinding: FC = () => {
                         url: Post.file,
                         conflictAction: 'uniquify',
                     })
+                },
+            },
+            copy_post_id: {
+                title: 'copy post id',
+                func: () => {
+                    if (!Post) return setGeneral({ mode: 'V' })
+                    copy(Post.id)
+                },
+            },
+            copy_parent_id: {
+                title: 'copy parent id',
+                func: () => {
+                    if (!Post) return setGeneral({ mode: 'V' })
+
+                    if (Post.has_children) return copy(`parent:${Post.id}`)
+                    if (Post.parent) return copy(`parent:${Post.parent}`)
+                },
+            },
+            copy_tags: {
+                title: 'copy tags',
+                func: () => {
+                    if (!Post) return setGeneral({ mode: 'V' })
+                    copy(Post.tags.join(' '))
                 },
             },
         })
