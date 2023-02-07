@@ -1,7 +1,5 @@
 import { Rating, ServerModel } from 'state'
 
-import { update_tags } from './shared'
-
 interface ACD {
     name: string
     type: string
@@ -33,6 +31,7 @@ var ACAC = new AbortController()
 const yandere: ServerModel = {
     name: 'yandere',
     limit: 500,
+    sort_score: 'order:score',
 
     autocomplete: async function (query) {
         ACAC.abort()
@@ -61,7 +60,6 @@ const yandere: ServerModel = {
 
     search: async function (tags, page) {
         ACAC.abort()
-        tags = update_tags(tags, 'order:score')
         let url = `https://yande.re/post.json?limit=${this.limit}&page=${
             page + 1
         }`

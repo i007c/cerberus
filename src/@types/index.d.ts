@@ -1,17 +1,10 @@
-import {
-    AutoCompleteModel,
-    GeneralModel,
-    PostModel,
-    SlideShowModel,
-} from 'state'
-
 declare global {
     var ClearActiveKeys: CustomEvent<{}>
 
-    var general: GeneralModel
-    var Post: PostModel | null
-    var SlideShow: SlideShowModel
-    var AutoComplete: AutoCompleteModel
+    // var general: GeneralModel
+    // var Post: PostModel | null
+    // var SlideShow: SlideShowModel
+    // var AutoComplete: AutoCompleteModel
 }
 
 export {}

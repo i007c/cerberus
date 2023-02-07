@@ -1,8 +1,6 @@
 import React, { FC, useEffect } from 'react'
 
-import { toggle_favorite_post } from 'utils'
-
-import { useAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import {
     ActionsAtom,
     GeneralAtom,
@@ -15,13 +13,9 @@ import {
 
 const KeyBinding: FC = () => {
     const [Actions, register] = useAtom(ActionsAtom)
-    const [GeneralState, setGeneral] = useAtom(GeneralAtom)
-    const [PostState, setPost] = useAtom(PostAtom)
-    const [SlideShowState, setSlideShow] = useAtom(SlideShowAtom)
-
-    global.Post = PostState
-    global.SlideShow = SlideShowState
-    global.general = GeneralState
+    const [general, setGeneral] = useAtom(GeneralAtom)
+    const [post, setPost] = useAtom(PostAtom)
+    const setSlideShow = useSetAtom(SlideShowAtom)
 
     const copy = (text: string | number) => {
         navigator.clipboard.writeText(`${text}`)
@@ -30,45 +24,12 @@ const KeyBinding: FC = () => {
 
     useEffect(() => {
         register({
-            set_mode: {
-                title: 'set or change the mode (V, I, C, ...)',
-                func: (_, args) => {
-                    const mode = `${args[0]}`.toUpperCase()
-                    if (check_mode(mode)) setGeneral({ mode })
-                },
-            },
-            toggle_favorite_post: {
-                title: 'toggle favorite post',
-                func: async () => {
-                    if (Post)
-                        setGeneral({
-                            favorite_list: await toggle_favorite_post(
-                                general.server.name,
-                                Post.id
-                            ),
-                        })
-                },
-            },
-            slideshow_speed: {
-                title: 'update slieshow speed',
-                func: (_, args) => {
-                    const update = get_movement(args)
-
-                    if (SlideShow.speed + update < 1) {
-                        setSlideShow({ speed: 0.3 })
-                    } else {
-                        setSlideShow({
-                            speed: Math.floor(SlideShow.speed + update),
-                        })
-                    }
-                },
-            },
             content_movement: {
                 title: 'go to the next or previous post',
                 func: (_, args) => {
                     if (general.posts.length === 0) {
                         setGeneral({ index: 0 })
-                        setPost(null)
+                        setPost({ type: 'null', id: 0 })
                         return
                     }
 
@@ -90,55 +51,47 @@ const KeyBinding: FC = () => {
 
                     if (index !== general.index) {
                         setGeneral({ index })
-                        setPost(general.posts[index] || null)
-                        setSlideShow({ pos: 0 })
+                        setPost(general.posts[index] || { type: 'null', id: 0 })
+                        // setSlideShow({ pos: 0 })
 
-                        if (SlideShow.running) {
-                            setSlideShow({ running: false })
-                            // SlideShow.running = false
-                            // setTimeout(() => {
-                            //     slideshow()
-                            // }, 500)
-                        }
+                        // if (SlideShow.running) {
+                        setSlideShow({ running: false, pos: 0 })
+                        // SlideShow.running = false
+                        // setTimeout(() => {
+                        //     slideshow()
+                        // }, 500)
+                        // }
                     }
                 },
             },
+        })
+    }, [general])
+
+    useEffect(() => {
+        register({
             open_current_post: {
                 title: 'open current post',
                 func: () => {
-                    if (!Post) return
+                    if (post.type === 'null') return
                     document.dispatchEvent(ClearActiveKeys)
-                    open(Post.link)
-                },
-            },
-            toggle_load_original: {
-                title: 'toggle load original',
-                description:
-                    'the next content loads will load the original file',
-                func: () => setGeneral({ original: !general.original }),
-            },
-            load_original: {
-                title: 'load original file',
-                func: () => {
-                    if (!Post) return
-                    setPost({ ...Post, force_original: true })
+                    open(post.link)
                 },
             },
             open_original: {
                 title: 'open post original file',
                 func: () => {
-                    if (!Post) return
+                    if (post.type === 'null') return
                     document.dispatchEvent(ClearActiveKeys)
-                    open(Post.file)
+                    open(post.file)
                 },
             },
             download_original: {
                 title: 'download original',
                 func: () => {
-                    if (!Post) return
+                    if (post.type === 'null') return
                     document.dispatchEvent(ClearActiveKeys)
                     chrome.downloads.download({
-                        url: Post.file,
+                        url: post.file,
                         conflictAction: 'uniquify',
                     })
                 },
@@ -146,28 +99,64 @@ const KeyBinding: FC = () => {
             copy_post_id: {
                 title: 'copy post id',
                 func: () => {
-                    if (!Post) return setGeneral({ mode: 'V' })
-                    copy(Post.id)
+                    if (post.type === 'null') return setGeneral({ mode: 'V' })
+                    copy(post.id)
                 },
             },
             copy_parent_id: {
                 title: 'copy parent id',
                 func: () => {
-                    if (!Post) return setGeneral({ mode: 'V' })
+                    if (post.type === 'null') return setGeneral({ mode: 'V' })
 
-                    if (Post.has_children) return copy(`parent:${Post.id}`)
-                    if (Post.parent) return copy(`parent:${Post.parent}`)
+                    if (post.has_children) return copy(`parent:${post.id}`)
+                    if (post.parent) return copy(`parent:${post.parent}`)
                 },
             },
             copy_tags: {
                 title: 'copy tags',
                 func: () => {
-                    if (!Post) return setGeneral({ mode: 'V' })
-                    copy(Post.tags.join(' '))
+                    if (post.type === 'null') return setGeneral({ mode: 'V' })
+                    copy(post.tags.join(' '))
                 },
             },
         })
-    }, [register])
+    }, [post])
+
+    useEffect(() => {
+        register({
+            set_mode: {
+                title: 'set or change the mode (V, I, C, ...)',
+                func: (_, args) => {
+                    const mode = `${args[0]}`.toUpperCase()
+                    if (check_mode(mode)) setGeneral({ mode })
+                },
+            },
+            slideshow_speed: {
+                title: 'update slieshow speed',
+                func: (_, args) => {
+                    const update = get_movement(args)
+
+                    setSlideShow(s => {
+                        if (s.speed + update < 1) {
+                            return { speed: 0.3 }
+                        }
+
+                        return { speed: Math.floor(s.speed + update) }
+                    })
+                },
+            },
+            toggle_load_original: {
+                title: 'toggle load original',
+                description:
+                    'the next content loads will load the original file',
+                func: () => setGeneral(s => ({ original: !s.original })),
+            },
+            load_original: {
+                title: 'load original file',
+                func: () => setPost({ force_original: true }),
+            },
+        })
+    }, [])
 
     useEffect(() => {
         // Object.keys(Actions).forEach(key => console.log(key))
@@ -204,7 +193,7 @@ const KeyBinding: FC = () => {
         return () => {
             document.removeEventListener('keydown', keydown)
         }
-    }, [Actions])
+    }, [Actions, general])
 
     return <></>
 }

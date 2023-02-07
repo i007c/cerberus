@@ -18,11 +18,11 @@ import {
 
 const Info: FC = () => {
     const register = useSetAtom(ActionsAtom)
-    const [ACTS, setAC] = useAtom(AutoCompleteAtom)
-    global.AutoComplete = ACTS
+    const [_AutoComplete, setAutoComplete] = useAtom(AutoCompleteAtom)
+    // global.AutoComplete = ACTS
 
     const setPost = useSetAtom(PostAtom)
-    const [GeneralState, setGeneral] = useAtom(GeneralAtom)
+    const [general, setGeneral] = useAtom(GeneralAtom)
 
     const [state, updateState] = useState({
         input: [] as string[],
@@ -50,7 +50,7 @@ const Info: FC = () => {
             },
             toggle_sort_score: {
                 title: 'toggle sort score',
-                func: () => setGeneral({ sort_score: !general.sort_score }),
+                func: () => setGeneral(s => ({ sort_score: !s.sort_score })),
             },
             change_server: {
                 title: 'change server',
@@ -74,20 +74,25 @@ const Info: FC = () => {
                     })
                 },
             },
+        })
+    }, [])
+
+    useEffect(() => {
+        register({
             autocomplete_select: {
                 title: 'select the autocomplete',
                 func: () =>
                     updateState(state => {
                         if (
-                            AutoComplete.tags.length < 1 ||
-                            AutoComplete.index === -1 ||
+                            _AutoComplete.tags.length < 1 ||
+                            _AutoComplete.index === -1 ||
                             state.ac_index === -1 ||
                             state.input.length < 1
                         )
                             return state
 
-                        let tag = AutoComplete.tags[AutoComplete.index]
-                        setAC({ index: -1, tags: [] })
+                        let tag = _AutoComplete.tags[_AutoComplete.index]
+                        setAutoComplete({ index: -1, tags: [] })
 
                         if (!tag) return state
 
@@ -106,12 +111,25 @@ const Info: FC = () => {
                         return new_state
                     }),
             },
+        })
+    }, [_AutoComplete])
+
+    useEffect(() => {
+        if (!input.current) return
+
+        if (general.mode === 'I') {
+            input.current.focus()
+        } else {
+            input.current.blur()
+        }
+
+        register({
             search: {
                 title: 'search the tags',
                 func: async () => {
                     if (!input.current) return
 
-                    setAC({ index: -1, tags: [] })
+                    setAutoComplete({ index: -1, tags: [] })
                     setGeneral({
                         end_page: false,
                         mode: 'V',
@@ -120,31 +138,24 @@ const Info: FC = () => {
                         page: 0,
                     })
 
-                    let new_posts = await general.server.search(
-                        input.current.value,
-                        0
-                    )
+                    let tags = input.current.value
+
+                    if (general.sort_score) {
+                        tags += ' ' + general.server.sort_score
+                    }
+
+                    let new_posts = await general.server.search(tags, 0)
 
                     setGeneral({ posts: new_posts })
-                    setPost(new_posts[0] || null)
+                    setPost(new_posts[0] || { type: 'null', id: 0 })
                 },
             },
         })
-    }, [register])
-
-    useEffect(() => {
-        if (!input.current) return
-
-        if (GeneralState.mode === 'I') {
-            input.current.focus()
-        } else {
-            input.current.blur()
-        }
-    }, [GeneralState])
+    }, [general])
 
     return (
         <div
-            className={'info' + C(['I', 'O'].includes(GeneralState.mode))}
+            className={'info' + C(['I', 'O'].includes(general.mode))}
             tabIndex={0}
         >
             <div className='inner-info'>
@@ -177,13 +188,10 @@ const Info: FC = () => {
 
                         setState({ input: new_tags })
 
-                        if (!GeneralState.server.autocomplete || !changing)
-                            return
+                        if (!general.server.autocomplete || !changing) return
 
-                        setAC({
-                            tags: await GeneralState.server.autocomplete(
-                                changing
-                            ),
+                        setAutoComplete({
+                            tags: await general.server.autocomplete(changing),
                             query: changing,
                             regQuery: new RegExp(
                                 `(${changing.replace(
@@ -195,38 +203,44 @@ const Info: FC = () => {
                         })
                     }}
                 ></textarea>
-                {ACTS.tags.length > 0 && (
+                {_AutoComplete.tags.length > 0 && (
                     <ul className='autocomplete'>
-                        {ACTS.tags.map(({ type, name, count }, idx) => (
-                            <li
-                                className={type + C(ACTS.index === idx)}
-                                key={idx + name}
-                            >
-                                <span className='name'>
-                                    {name
-                                        .split(ACTS.regQuery)
-                                        .map((s, sidx) => (
-                                            <Fragment key={sidx}>
-                                                {s.toLocaleLowerCase() ===
-                                                ACTS.query ? (
-                                                    <mark>{s}</mark>
-                                                ) : (
-                                                    s
-                                                )}
-                                            </Fragment>
-                                        ))}
-                                </span>
-                                <span className='count'>
-                                    {count === -1 ? '' : count.toLocaleString()}
-                                </span>
-                            </li>
-                        ))}
+                        {_AutoComplete.tags.map(
+                            ({ type, name, count }, idx) => (
+                                <li
+                                    className={
+                                        type + C(_AutoComplete.index === idx)
+                                    }
+                                    key={idx + name}
+                                >
+                                    <span className='name'>
+                                        {name
+                                            .split(_AutoComplete.regQuery)
+                                            .map((s, sidx) => (
+                                                <Fragment key={sidx}>
+                                                    {s.toLocaleLowerCase() ===
+                                                    _AutoComplete.query ? (
+                                                        <mark>{s}</mark>
+                                                    ) : (
+                                                        s
+                                                    )}
+                                                </Fragment>
+                                            ))}
+                                    </span>
+                                    <span className='count'>
+                                        {count === -1
+                                            ? ''
+                                            : count.toLocaleString()}
+                                    </span>
+                                </li>
+                            )
+                        )}
                     </ul>
                 )}
 
                 <div className='checkbox-row'>
                     <input
-                        checked={GeneralState.sort_score}
+                        checked={general.sort_score}
                         type='checkbox'
                         id='sort_score_checkbox'
                         onChange={() => {}}

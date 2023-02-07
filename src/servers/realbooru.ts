@@ -1,6 +1,6 @@
 import { PostModel, Rating, ServerModel } from 'state'
 
-import { IMAGE_EXT, update_tags, VIDEO_EXT } from './shared'
+import { IMAGE_EXT, VIDEO_EXT } from './shared'
 
 type JPost = {
     directory: string
@@ -21,6 +21,7 @@ var ACAC = new AbortController()
 const realbooru: ServerModel = {
     name: 'realbooru',
     limit: 500,
+    sort_score: 'sort:score',
 
     autocomplete: async query => {
         ACAC.abort()
@@ -44,7 +45,6 @@ const realbooru: ServerModel = {
     },
     search: async function (tags, page) {
         ACAC.abort()
-        tags = update_tags(tags, 'sort:score')
         let url = `https://realbooru.com/index.php?page=dapi&s=post&limit=${this.limit}`
         url += '&json=1&q=index&pid=' + page
 

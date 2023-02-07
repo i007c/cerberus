@@ -1,3 +1,5 @@
+import { GeneralModel } from 'state'
+
 async function load_favorite_list(server: string): Promise<number[]> {
     let db = await chrome.storage.local.get('favorite_lists')
 
@@ -21,6 +23,7 @@ async function load_favorite_list(server: string): Promise<number[]> {
 }
 
 async function toggle_favorite_post(
+    general: GeneralModel,
     server: string,
     post_id: number
 ): Promise<number[]> {

@@ -1,7 +1,7 @@
 type Rating = 'questionable' | 'safe' | 'explicit'
 
 type Post = {
-    type: 'image' | 'video' | 'gif'
+    type: 'image' | 'video' | 'gif' | 'null'
     id: number
     parent?: number
     has_children: boolean
@@ -30,6 +30,7 @@ type AutoComplete = {
 }
 
 type Server = {
+    sort_score: string
     name: string
     limit: number
     autocomplete: null | ((query: string) => Promise<AutoCompleteTag[]>)

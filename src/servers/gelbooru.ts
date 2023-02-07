@@ -1,6 +1,6 @@
 import { ServerModel } from 'state'
 
-import { IMAGE_EXT, update_tags, VIDEO_EXT } from './shared'
+import { IMAGE_EXT, VIDEO_EXT } from './shared'
 
 var ACAC = new AbortController()
 
@@ -26,6 +26,8 @@ interface PD {
 const gelbooru: ServerModel = {
     name: 'gelbooru',
     limit: 100,
+    sort_score: 'sort:score',
+
     autocomplete: async query => {
         ACAC.abort()
         ACAC = new AbortController()
@@ -48,7 +50,6 @@ const gelbooru: ServerModel = {
     },
     search: async function (tags, page) {
         ACAC.abort()
-        tags = update_tags(tags, 'sort:score')
         let url = 'https://gelbooru.com/index.php?page=dapi&s=post&json=1'
         url += '&q=index&pid=' + page
 

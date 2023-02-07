@@ -1,7 +1,7 @@
 import { yandere } from 'servers'
 
 import { atom } from 'jotai'
-import { GeneralModel } from 'state'
+import { GeneralModel, get_data, SetArgs } from 'state'
 
 const DEFAULT_VALUE: GeneralModel = {
     favorite_list: [],
@@ -17,12 +17,11 @@ const DEFAULT_VALUE: GeneralModel = {
 }
 
 const General = atom<GeneralModel>(DEFAULT_VALUE)
-global.general = DEFAULT_VALUE
 
 const GeneralAtom = atom(
     get => get(General),
-    (get, set, args: Partial<GeneralModel>) => {
-        set(General, { ...get(General), ...args })
+    (get, set, args: SetArgs<GeneralModel>) => {
+        set(General, get_data(args, get(General)))
     }
 )
 

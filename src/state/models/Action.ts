@@ -19,4 +19,5 @@ export {
     Action as ActionModel,
     KeyBind as KeyBindModel,
     ActionArgs,
+    ActionFunc,
 }

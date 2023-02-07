@@ -1,6 +1,6 @@
 import { PostModel, Rating, ServerModel } from 'state'
 
-import { IMAGE_EXT, Parser, update_tags, VIDEO_EXT } from './shared'
+import { IMAGE_EXT, Parser, VIDEO_EXT } from './shared'
 
 interface ACD {
     value: string
@@ -13,6 +13,7 @@ var ACAC = new AbortController()
 const rule34: ServerModel = {
     name: 'rule34',
     limit: 500,
+    sort_score: 'sort:score',
 
     autocomplete: async query => {
         ACAC.abort()
@@ -42,7 +43,6 @@ const rule34: ServerModel = {
     },
     search: async function (tags, page) {
         ACAC.abort()
-        tags = update_tags(tags, 'sort:score')
         let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&limit=${this.limit}`
         url += '&q=index&pid=' + page
 

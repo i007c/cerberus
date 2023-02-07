@@ -1,33 +1,63 @@
 import { atom } from 'jotai'
-import { AutoCompleteModel, PostModel } from 'state'
+import {
+    AutoCompleteModel,
+    GeneralAtom,
+    get_data,
+    PostModel,
+    SetArgs,
+} from 'state'
 
-const Post = atom<PostModel | null>(null)
-global.Post = null
+const DEFAULT_POST: PostModel = {
+    type: 'null',
+    id: 0,
+    has_children: false,
+    tags: [],
+    rating: 'safe',
+    ext: '',
+    score: -1,
+    file: '',
+    sample: '',
+    link: '',
+}
+
+const Post = atom<PostModel>(DEFAULT_POST)
 
 const PostAtom = atom(
     get => get(Post),
-    (_, set, args: PostModel | null) => {
-        if (args !== null)
-            args.is_favorite = general.favorite_list.includes(args.id)
-        set(Post, args)
+    (get, set, args: SetArgs<PostModel>) => {
+        const state = get(Post)
+        const data = get_data(args, state)
+
+        if (state.type === 'null' && data.type === 'null') {
+            // dont do anything
+            return
+        }
+
+        if (state.id !== data.id) {
+            const general = get(GeneralAtom)
+            data.is_favorite = general.favorite_list.includes(data.id)
+        }
+
+        set(Post, data)
     }
 )
 
-const DEFAULT_VALUE = {
+const DEFAULT_AC = {
     tags: [],
     query: '',
     regQuery: new RegExp(''),
     index: 0,
 }
 
-const AutoComplete = atom<AutoCompleteModel>(DEFAULT_VALUE)
-global.AutoComplete = DEFAULT_VALUE
+const AutoComplete = atom<AutoCompleteModel>(DEFAULT_AC)
 
 const AutoCompleteAtom = atom(
     get => get(AutoComplete),
-    (get, set, args: Partial<AutoCompleteModel>) => {
-        args.index = 0
-        set(AutoComplete, { ...get(AutoComplete), ...args })
+    (get, set, args: SetArgs<AutoCompleteModel>) => {
+        let data = get_data(args, get(AutoComplete))
+        data.index = 0
+
+        set(AutoComplete, data)
     }
 )
 
