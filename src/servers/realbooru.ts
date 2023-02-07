@@ -58,22 +58,26 @@ const realbooru: ServerModel = {
 
         json.forEach(post => {
             const file = post.image
+            const ext = file.split('.').at(-1)
 
-            const ext = file.split('.').at(-1) || 'png'
+            if (!ext) {
+                throw new Error(`realbooru ext not found ${ext}`)
+            }
+
             let type: 'image' | 'video' = 'image'
 
             if (VIDEO_EXT.includes(ext)) {
                 type = 'video'
             } else if (!IMAGE_EXT.includes(ext)) {
-                throw Error(ext)
+                throw new Error(`realbooru invalid ext not found ${ext}`)
             }
 
             data.push({
                 type,
                 score: -1,
-                file: `https://realbooru.com/images/${post.directory}/${post.image}`,
+                file: `https://realbooru.com/images/${post.directory}/${post.hash}.${ext}`,
                 parent: post.parent_id,
-                sample: `https://realbooru.com/images/${post.directory}/${post.image}`,
+                sample: `https://realbooru.com/images/${post.directory}/${post.hash}.${ext}`,
                 id: post.id,
                 has_children: false,
                 tags: post.tags.trim().split(' '),
