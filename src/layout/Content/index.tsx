@@ -66,36 +66,6 @@ const Content: FC = () => {
     }, [])
 
     useEffect(() => {
-        if (loader_http) loader_http.abort()
-        if (!post || post.type === 'video') {
-            setState({
-                image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+Q8AAQ0BBYgRfXMAAAAASUVORK5CYII=',
-                loading: 0,
-            })
-            return
-        }
-
-        let url =
-            general.original || !!post.force_original ? post.file : post.sample
-
-        loader_http = new XMLHttpRequest()
-
-        loader_http.open('GET', url, true)
-        loader_http.responseType = 'arraybuffer'
-
-        loader_http.onload = function () {
-            var blob = new Blob([this.response])
-            setState({ loading: 0, image: URL.createObjectURL(blob) })
-        }
-
-        loader_http.onprogress = function (e) {
-            setState({ loading: (e.loaded / e.total) * 100 })
-        }
-
-        loader_http.onloadstart = () => setState({ loading: 0 })
-
-        loader_http.send()
-
         register({
             toggle_video_playing: {
                 title: 'toggle playing video',
@@ -155,6 +125,36 @@ const Content: FC = () => {
                 },
             },
         })
+
+        if (loader_http) loader_http.abort()
+        if (post.type === 'video') {
+            setState({
+                image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+Q8AAQ0BBYgRfXMAAAAASUVORK5CYII=',
+                loading: 0,
+            })
+            return
+        }
+
+        let url =
+            general.original || !!post.force_original ? post.file : post.sample
+
+        loader_http = new XMLHttpRequest()
+
+        loader_http.open('GET', url, true)
+        loader_http.responseType = 'arraybuffer'
+
+        loader_http.onload = function () {
+            var blob = new Blob([this.response])
+            setState({ loading: 0, image: URL.createObjectURL(blob) })
+        }
+
+        loader_http.onprogress = function (e) {
+            setState({ loading: (e.loaded / e.total) * 100 })
+        }
+
+        loader_http.onloadstart = () => setState({ loading: 0 })
+
+        loader_http.send()
     }, [post])
 
     return (
@@ -187,7 +187,7 @@ const Content: FC = () => {
                     <div className='volume'>
                         <div
                             style={{
-                                width: state.video_volume + '%',
+                                height: state.video_volume + '%',
                                 backgroundColor: state.video_muted
                                     ? '#fd5e00'
                                     : '#fd0079',
@@ -196,7 +196,7 @@ const Content: FC = () => {
                     </div>
                 )}
 
-                {post && post.type === 'video' && (
+                {post.type === 'video' && (
                     <div className='timeline'>
                         <div
                             style={{
@@ -228,7 +228,7 @@ const Content: FC = () => {
                     <div></div>
                 </div>
 
-                <Zoom />
+                <Zoom source={post.type === 'video' ? video : image} />
             </div>
         </div>
     )

@@ -1,8 +1,8 @@
-type ZoomState = {
+type Zoom = {
     x: number
     y: number
     level: number
     speed: number
 }
 
-export { ZoomState as ZoomStateModel }
+export { Zoom as ZoomModel }

@@ -288,6 +288,16 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
     'Z-KeyF-0-0-0-0': [['toggle_fullscreen', []]],
     'Z-KeyQ-0-0-0-0': [['set_mode', ['V']]],
     'Z-KeyU-0-0-0-0': [['open_current_post', []]],
+    // video controls
+    'Z-Space-0-0-0-0': [['toggle_video_playing', []]],
+    'Z-ArrowRight-0-0-0-0': [['update_video_time', [+1]]],
+    'Z-ArrowLeft-0-0-0-0': [['update_video_time', [-1]]],
+    'Z-ArrowRight-0-0-0-1': [['update_video_time', [+10]]],
+    'Z-ArrowLeft-0-0-0-1': [['update_video_time', [-10]]],
+    'Z-ArrowUp-0-0-0-0': [['change_video_volume', [+0.05]]],
+    'Z-ArrowDown-0-0-0-0': [['change_video_volume', [-0.05]]],
+    'Z-KeyL-0-0-0-0': [['toggle_video_loop', []]],
+    'Z-KeyM-0-0-0-0': [['toggle_video_mute', []]],
 
     'Z-Minus-0-0-0-0': [['change_zoom_level', [-1]]],
     'Z-Digit1-0-0-0-0': [['change_zoom_level', [-1]]],

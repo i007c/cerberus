@@ -1,96 +1,256 @@
-import React, { FC } from 'react'
+import React, { FC, RefObject, useEffect, useRef } from 'react'
+
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { ActionsAtom, GeneralAtom, PostAtom, ZoomAtom, ZoomModel } from 'state'
 
 import './style/zoom.scss'
 
-const Zoom: FC = () => {
-    return <></>
-
-    /* 
-    const Post = useAtomValue(PostAtom)
-    // const canvas = useRef<HTMLCanvasElement>(null)
-
-
-    useEffect(() => {
-        const video = document.querySelector<HTMLVideoElement>('video.main')!
-        const canvas = document.querySelector<HTMLCanvasElement>('canvas')!
-        // const img = document.querySelector<HTMLImageElement>('img.main')
-        if (!video || !canvas) throw new Error('error getting main video')
-
-        // if (Post.type !== 'image' || !canvas.current) return
-
-        canvas.width = video.videoWidth / 2
-        canvas.height = video.videoHeight / 2
-
-        const context = canvas.getContext('2d')!
-        if (!context) throw new Error('error getting canvas context')
-
-        // if (img.complete) {
-        //     canvas.current.width = img.naturalWidth
-        //     canvas.current.height = img.naturalHeight
-        //     draw(canvas.current, context, img)
-        // } else {
-        //     img.onload = () => {
-        //         if (!canvas.current) return
-        //         canvas.current.width = img.naturalWidth
-        //         canvas.current.height = img.naturalHeight
-        //         draw(canvas.current, context, img)
-        //     }
-        // }
-
-        function timerCallback() {
-            canvas.width = video.videoWidth
-            canvas.height = video.videoHeight
-
-            context.drawImage(video, 0, 0, canvas.width, canvas.height)
-            if (video.paused || video.ended) {
-                return
-            }
-
-            // const data = frame.data;
-
-            setTimeout(timerCallback, 0)
-
-            // timerCallback()
-        }
-
-        // setInterval(timerCallback, 1)
-
-        // timerCallback()
-
-        // video.addEventListener('timeupdate', timerCallback)
-        video.addEventListener('play', timerCallback)
-        video.addEventListener('timeupdate', () => {
-            if (video.paused) timerCallback()
-        })
-
-        console.log(Post)
-    }, [Post])
-
-
-    // return (
-    //     <div className='zoomed-container'>
-    //         <canvas className='zoomed'></canvas>
-    //     </div>
-    // ) */
+type Props = {
+    source: RefObject<HTMLVideoElement | HTMLImageElement>
 }
 
-// type Source = HTMLImageElement | HTMLVideoElement
-// function draw(
-//     canvas: HTMLCanvasElement,
-//     context: CanvasRenderingContext2D,
-//     source: Source
-// ) {
-//     context.drawImage(
-//         source,
-//         0,
-//         0,
-//         canvas.width,
-//         canvas.height,
-//         0,
-//         0,
-//         canvas.width,
-//         canvas.height
-//     )
-// }
+var AbortVideoRender: NodeJS.Timeout | null = null
+var draw: DrawFunc = _ => console.log('not set')
+
+const Zoom: FC<Props> = ({ source }) => {
+    const [zoom, setZoom] = useAtom(ZoomAtom)
+    const register = useSetAtom(ActionsAtom)
+    const post = useAtomValue(PostAtom)
+    const general = useAtomValue(GeneralAtom)
+    const ref = useRef<HTMLCanvasElement>(null)
+
+    useEffect(() => {
+        register({
+            change_zoom_pos: {
+                title: 'change zoom position',
+                func: (_, args) => {
+                    const axis = args[0]
+                    const dir = args[1]
+
+                    if (
+                        (axis !== 'x' && axis !== 'y') ||
+                        typeof dir !== 'number'
+                    )
+                        return
+
+                    if (args[2]) {
+                        setZoom(s => {
+                            draw({ ...s, [axis]: dir })
+                            return { [axis]: dir }
+                        })
+
+                        return
+                    }
+
+                    setZoom(s => {
+                        let value = s[axis] + (dir * s.speed) / s.level
+
+                        let max = 0
+                        let min = 0
+
+                        if (ref.current && axis === 'x') {
+                            max = ref.current.width - 20
+                            min = (ref.current.width * -10) / s.level + 20
+                        } else if (ref.current && axis === 'y') {
+                            max = ref.current.height - 20
+                            min = (ref.current.height * -10) / s.level + 20
+                        }
+
+                        if (value < min) value = min
+                        if (value > max) value = max
+
+                        draw({ ...s, [axis]: value })
+
+                        return {
+                            [axis]: value,
+                        }
+                    })
+                },
+            },
+            change_zoom_speed: {
+                title: 'change zoom speed',
+                func: (_, args) => {
+                    let speed = args[0]
+
+                    setZoom(s => {
+                        if (typeof speed !== 'number') return {}
+                        if (!args[1]) {
+                            speed = s.speed + speed
+                        }
+
+                        if (speed < 1) speed = 1
+
+                        return { speed }
+                    })
+                },
+            },
+            set_zoom_comic: {
+                title: 'set zoom to comic view',
+                func: () => {
+                    setZoom(s => {
+                        draw({ ...s, level: 10, x: 0 })
+                        return { level: 10, x: 0 }
+                    })
+                },
+            },
+            change_zoom_level: {
+                title: 'change zoom level',
+                func: (_, args) => {
+                    let level = args[0]
+
+                    setZoom(s => {
+                        if (typeof level !== 'number') return {}
+
+                        if (!args[1]) {
+                            level = s.level + level
+                        }
+
+                        draw({ ...s, level })
+
+                        return { level }
+                    })
+                },
+            },
+        })
+    }, [])
+
+    useEffect(() => {
+        if (general.mode !== 'Z') {
+            if (AbortVideoRender) {
+                clearTimeout(AbortVideoRender)
+                AbortVideoRender = null
+            }
+            draw = () => {}
+            return
+        }
+
+        const canvas = ref.current
+        const src = source.current
+
+        if (!src || !canvas) return
+
+        if (src instanceof HTMLImageElement) {
+            draw = draw_image(src, canvas)
+            setZoom({
+                speed: Math.round((src.naturalWidth + src.naturalHeight) / 20),
+            })
+
+            src.onload = () => {
+                draw = draw_image(src, canvas)
+                setZoom({
+                    speed: Math.round(
+                        (src.naturalWidth + src.naturalHeight) / 20
+                    ),
+                })
+                draw(zoom)
+            }
+        } else {
+            draw = draw_video(src, canvas)
+
+            setZoom({
+                speed: Math.round((src.videoWidth + src.videoHeight) / 20),
+            })
+
+            src.onloadeddata = () => {
+                draw = draw_video(src, canvas)
+                setZoom({
+                    speed: Math.round((src.videoWidth + src.videoHeight) / 20),
+                })
+                draw(zoom)
+            }
+        }
+
+        draw(zoom)
+    }, [post, source, general])
+
+    if (post.type === 'null' || general.mode !== 'Z') return <></>
+
+    return (
+        <div className='zoomed-container'>
+            <canvas ref={ref} className='zoomed'></canvas>
+        </div>
+    )
+}
+
+type DrawFunc = (state: ZoomModel) => void
+type Draw<T> = (source: T, canvas: HTMLCanvasElement) => DrawFunc
+
+const draw_image: Draw<HTMLImageElement> = (image, canvas) => {
+    if (image.naturalWidth > image.naturalHeight) {
+        canvas.width = (image.naturalHeight * 16) / 9
+        canvas.height = image.naturalHeight
+    } else {
+        canvas.width = image.naturalWidth
+        canvas.height = (image.naturalWidth * 9) / 16
+    }
+
+    const context = canvas.getContext('2d')!
+
+    return state => {
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        context.drawImage(
+            image,
+            state.x,
+            state.y,
+            (canvas.width * 10) / state.level,
+            (canvas.height * 10) / state.level,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        )
+    }
+}
+
+const draw_video: Draw<HTMLVideoElement> = (video, canvas) => {
+    if (video.videoWidth > video.videoHeight) {
+        canvas.width = (video.videoHeight * 16) / 9
+        canvas.height = video.videoHeight
+    } else {
+        canvas.width = video.videoWidth
+        canvas.height = (video.videoWidth * 9) / 16
+    }
+
+    const context = canvas.getContext('2d')!
+
+    return state => {
+        if (AbortVideoRender) {
+            clearTimeout(AbortVideoRender)
+            AbortVideoRender = null
+        }
+
+        function timerCallback() {
+            context.clearRect(0, 0, canvas.width, canvas.height)
+            context.drawImage(
+                video,
+                state.x,
+                state.y,
+                (canvas.width * 10) / state.level,
+                (canvas.height * 10) / state.level,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            )
+
+            if (video.paused || video.ended || video.readyState !== 4) return
+
+            AbortVideoRender = setTimeout(timerCallback, 1)
+        }
+
+        timerCallback()
+
+        video.onplay = () => timerCallback()
+        video.ontimeupdate = () => video.paused && timerCallback()
+        video.onprogress = () => {
+            if (AbortVideoRender) {
+                clearTimeout(AbortVideoRender)
+                AbortVideoRender = null
+            }
+
+            if (video.readyState === 4) timerCallback()
+        }
+    }
+}
 
 export { Zoom }

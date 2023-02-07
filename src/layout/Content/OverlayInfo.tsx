@@ -48,11 +48,12 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
             <div
                 className='isr'
                 style={{
-                    flexDirection: show_tags ? 'column' : 'row',
+                    flexDirection: show_tags ? 'row' : 'column',
                 }}
             >
-                {post ? (
+                {post.type !== 'null' ? (
                     <>
+                        <span className='type'>{post.type}</span>
                         <span className='id'>
                             {post.id}
                             {post.is_favorite ? ' 🩷' : ''}
@@ -71,6 +72,7 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                     </>
                 ) : (
                     <>
+                        <span className='type'>N/A</span>
                         <span className='id'>N/A</span>
                         <span className='score'>N/A</span>
                         <span className='rating'>N/A</span>
@@ -79,14 +81,15 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                     </>
                 )}
             </div>
-            {post && post.parent && post.parent > 0 && (
+            {/* {post.type !== 'null' && post.parent && post.parent > 0 && (
                 <span className='parent'>parent: {post.parent}</span>
-            )}
+            )} */}
 
-            {show_tags && post && (
+            {show_tags && post.type !== 'null' && (
                 <div className='tags'>
                     {post.tags.map(tag => (
                         <span
+                            key={tag}
                             onClick={() => navigator.clipboard.writeText(tag)}
                         >
                             {tag}

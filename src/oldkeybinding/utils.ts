@@ -7,14 +7,6 @@ import { Actions } from './actions'
 
 
 
-const B2B = (bool: boolean) => (bool ? '1' : '0')
-
-function key_to_idx(e: KeyboardEvent) {
-    return (
-        `${e.code}-${B2B(e.altKey)}-` +
-        `${B2B(e.ctrlKey)}-${B2B(e.metaKey)}-${B2B(e.shiftKey)}`
-    )
-}
 
 
 

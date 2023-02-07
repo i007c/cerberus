@@ -1,7 +1,7 @@
 import { atom } from 'jotai'
-import { get_data, SetArgs, ZoomStateModel } from 'state'
+import { get_data, SetArgs, ZoomModel } from 'state'
 
-const Zoom = atom<ZoomStateModel>({
+const Zoom = atom<ZoomModel>({
     level: 10,
     x: 1,
     y: 1,
@@ -10,7 +10,7 @@ const Zoom = atom<ZoomStateModel>({
 
 const ZoomAtom = atom(
     get => get(Zoom),
-    (get, set, args: SetArgs<ZoomStateModel>) => {
+    (get, set, args: SetArgs<ZoomModel>) => {
         set(Zoom, get_data(args, get(Zoom)))
     }
 )
