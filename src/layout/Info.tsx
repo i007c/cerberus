@@ -258,7 +258,9 @@ const Info: FC = () => {
                 >
                     {Object.keys(SERVERS).map(key => (
                         <option key={key} value={key}>
-                            {key.replaceAll('_', ' ')}
+                            {key
+                                .replaceAll('_', ' ')
+                                .replaceAll('booru', ' booru')}
                         </option>
                     ))}
                 </select>
