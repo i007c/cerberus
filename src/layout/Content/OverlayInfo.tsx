@@ -1,9 +1,11 @@
 import React, { CSSProperties, FC, useEffect } from 'react'
 
+import { C } from '@00-team/utils'
+
 import { toggle_favorite_post } from 'utils'
 
 import { useAtomValue, useSetAtom } from 'jotai'
-import { ActionsAtom, GeneralAtom, PostAtom } from 'state'
+import { ActionsAtom, GeneralAtom, PostAtom, SlideShowAtom } from 'state'
 
 type Props = {
     show: boolean
@@ -15,6 +17,7 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
     const setGeneral = useSetAtom(GeneralAtom)
     const general = useAtomValue(GeneralAtom)
     const post = useAtomValue(PostAtom)
+    const slideshow = useAtomValue(SlideShowAtom)
 
     const main_style: CSSProperties = {
         display: show ? '' : 'none',
@@ -53,22 +56,24 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
             >
                 {post.type !== 'null' ? (
                     <>
-                        <span className='type'>{post.type}</span>
+                        <span className='type'>
+                            {post.type}/{post.ext}
+                        </span>
                         <span className='id'>
                             {post.id}
                             {post.is_favorite ? ' 🩷' : ''}
                         </span>
+                        {post.parent && (
+                            <span className='parent'>
+                                parent: {post.parent}
+                            </span>
+                        )}
                         {post.score !== -1 && (
                             <span className='score'>{post.score}</span>
                         )}
                         <span className={'rating ' + post.rating}>
                             {post.rating}
                         </span>
-                        <span className='index'>
-                            {general.index + 1}/{general.posts.length} |{' '}
-                            {general.page}
-                        </span>
-                        <span className='slideshow'>N/A</span>
                     </>
                 ) : (
                     <>
@@ -76,14 +81,16 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                         <span className='id'>N/A</span>
                         <span className='score'>N/A</span>
                         <span className='rating'>N/A</span>
-                        <span className='index'>N/A</span>
-                        <span className='slideshow'>N/A</span>
                     </>
                 )}
+
+                <span className='index'>
+                    {general.index + 1}/{general.posts.length} | {general.page}
+                </span>
+                <span className={'slideshow' + C(slideshow_running, 'running')}>
+                    {slideshow.speed}
+                </span>
             </div>
-            {/* {post.type !== 'null' && post.parent && post.parent > 0 && (
-                <span className='parent'>parent: {post.parent}</span>
-            )} */}
 
             {show_tags && post.type !== 'null' && (
                 <div className='tags'>

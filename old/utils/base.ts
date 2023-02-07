@@ -1,15 +1,3 @@
-import {
-    cache_posts,
-    overlay_info,
-    plate_image,
-    plate_video,
-    slideshow_bar,
-    timeline_bar,
-} from 'elements'
-import { State } from 'globals'
-
-import { update_plate_image } from './loader'
-
 var CACHE_CTRL: AbortController | null = null
 
 async function search(replace = false) {
@@ -98,47 +86,7 @@ async function cache_content(signal: AbortSignal) {
     }
 }
 
-function slideshow() {
-    State.slideshow.running = true
-    let _speed = State.slideshow.speed
-    let total = State.slideshow.speed * 1000
-    let start = performance.now()
-    let progress = 0
-
-    if (State.slideshow.pos) {
-        start = start - (total / 100) * State.slideshow.pos
-    }
-
-    overlay_info.slideshow.textContent = `${State.slideshow.speed}s 🍏`
-
-    function anime() {
-        if (!State.slideshow.running) {
-            overlay_info.slideshow.textContent = `${State.slideshow.speed}s 🍎`
-            return
-        }
-
-        if (_speed !== State.slideshow.speed) {
-            total = State.slideshow.speed * 1000
-            _speed = State.slideshow.speed
-            overlay_info.slideshow.textContent = `${State.slideshow.speed}s 🍏`
-        }
-
-        progress = performance.now() - start
-
-        State.slideshow.pos = (100 / total) * progress
-        slideshow_bar.style.width = State.slideshow.pos + '%'
-
-        // restart
-        if (progress > total) {
-            start = performance.now()
-            change_content(+1)
-        }
-
-        requestAnimationFrame(anime)
-    }
-
-    requestAnimationFrame(anime)
-}
+function slideshow() {}
 
 export { search }
 export { render_content }

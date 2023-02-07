@@ -1,4 +1,4 @@
-import React, { FC, RefObject } from 'react'
+import React, { FC, RefObject, useEffect } from 'react'
 
 var volume_timeout: NodeJS.Timeout | null = null
 
@@ -9,11 +9,17 @@ type Props = {
 }
 
 const Video: FC<Props> = ({ file, videoRef, setState }) => {
+    useEffect(() => {
+        if (!videoRef.current) return
+
+        videoRef.current.volume = 0.2
+    }, [videoRef])
+
     return (
         <video
             ref={videoRef}
             className='main'
-            // autoPlay
+            autoPlay
             src={file}
             onVolumeChange={e => {
                 if (volume_timeout) clearTimeout(volume_timeout)

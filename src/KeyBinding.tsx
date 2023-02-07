@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react'
 
-import { useAtom, useSetAtom } from 'jotai'
+import { useAtom } from 'jotai'
 import {
     ActionsAtom,
     GeneralAtom,
@@ -15,53 +15,92 @@ const KeyBinding: FC = () => {
     const [Actions, register] = useAtom(ActionsAtom)
     const [general, setGeneral] = useAtom(GeneralAtom)
     const [post, setPost] = useAtom(PostAtom)
-    const setSlideShow = useSetAtom(SlideShowAtom)
+    const [slideshow, setSlideShow] = useAtom(SlideShowAtom)
 
     const copy = (text: string | number) => {
         navigator.clipboard.writeText(`${text}`)
         setGeneral({ mode: 'V' })
     }
 
+    const change_content = (movement: number) => {
+        if (general.posts.length === 0) {
+            setGeneral({ index: 0 })
+            setPost({ type: 'null', id: 0 })
+            return
+        }
+
+        let index = general.index
+        index += movement
+
+        if (index >= general.posts.length) {
+            index = 0
+
+            // if (!general.isLocal && !State.end_page) {
+            //     State.page++
+            //     search()
+            //     return
+            // }
+        } else if (index < 0) {
+            index = general.posts.length - 1
+        }
+
+        if (index !== general.index) {
+            setGeneral({ index })
+            setPost(general.posts[index] || { type: 'null', id: 0 })
+            // setSlideShow({ pos: 0 })
+
+            // if (slideshow_running) {
+            //     slideshow_running = false
+            //     setTimeout(() => {
+            //         run_slideshow()
+            //     }, 500)
+            // }
+        }
+    }
+
+    // const run_slideshow = () => {
+    //     slideshow_running = true
+
+    //     let _speed = slideshow.speed
+    //     let total = slideshow.speed * 1000
+    //     let start = performance.now()
+    //     let progress = 0
+
+    //     if (slideshow.pos) {
+    //         start = start - (total / 100) * slideshow.pos
+    //     }
+
+    //     function anime() {
+    //         if (!slideshow_running) return
+
+    //         if (_speed !== slideshow.speed) {
+    //             total = slideshow.speed * 1000
+    //             _speed = slideshow.speed
+    //             console.log('speed change')
+    //         }
+
+    //         progress = performance.now() - start
+
+    //         setSlideShow({ pos: (100 / total) * progress })
+
+    //         // restart
+    //         if (progress > total) {
+    //             start = performance.now()
+    //             change_content(+1)
+    //         }
+
+    //         requestAnimationFrame(anime)
+    //     }
+
+    //     requestAnimationFrame(anime)
+    // }
+
     useEffect(() => {
         register({
             content_movement: {
                 title: 'go to the next or previous post',
                 func: (_, args) => {
-                    if (general.posts.length === 0) {
-                        setGeneral({ index: 0 })
-                        setPost({ type: 'null', id: 0 })
-                        return
-                    }
-
-                    const update = get_movement(args)
-                    let index = general.index
-                    index += update
-
-                    if (index >= general.posts.length) {
-                        index = 0
-
-                        // if (!general.isLocal && !State.end_page) {
-                        //     State.page++
-                        //     search()
-                        //     return
-                        // }
-                    } else if (index < 0) {
-                        index = general.posts.length - 1
-                    }
-
-                    if (index !== general.index) {
-                        setGeneral({ index })
-                        setPost(general.posts[index] || { type: 'null', id: 0 })
-                        // setSlideShow({ pos: 0 })
-
-                        // if (SlideShow.running) {
-                        setSlideShow({ running: false, pos: 0 })
-                        // SlideShow.running = false
-                        // setTimeout(() => {
-                        //     slideshow()
-                        // }, 500)
-                        // }
-                    }
+                    change_content(get_movement(args))
                 },
             },
         })
@@ -143,6 +182,8 @@ const KeyBinding: FC = () => {
 
                         return { speed: Math.floor(s.speed + update) }
                     })
+
+                    // if (slideshow_running) run_slideshow()
                 },
             },
             toggle_load_original: {
@@ -157,6 +198,21 @@ const KeyBinding: FC = () => {
             },
         })
     }, [])
+
+    useEffect(() => {
+        register({
+            toggle_slideshow: {
+                title: 'toggle slideshow',
+                func: () => {
+                    // if (slideshow_running || post.type !== 'image') {
+                    //     slideshow_running = false
+                    //     return
+                    // }
+                    // run_slideshow()
+                },
+            },
+        })
+    }, [slideshow, post])
 
     useEffect(() => {
         // Object.keys(Actions).forEach(key => console.log(key))
@@ -227,7 +283,10 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
     'V-KeyC-0-0-0-0': [['set_mode', ['C']]],
     'V-KeyZ-0-0-0-0': [['set_mode', ['Z']]],
     'V-KeyO-0-0-0-0': [['set_mode', ['O']]],
-    'V-Space-0-0-0-0': [['toggle_video_playing', []]],
+    'V-Space-0-0-0-0': [
+        ['toggle_video_playing', []],
+        ['toggle_slideshow', []],
+    ],
     'V-KeyF-0-0-0-0': [['toggle_fullscreen', []]],
     'V-Minus-0-0-0-0': [['slideshow_speed', [-1]]],
     'V-Digit1-0-0-0-0': [['slideshow_speed', [-1]]],

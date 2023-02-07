@@ -3,11 +3,11 @@ import { get_data, SetArgs, SlideShowModel } from 'state'
 
 const DEFAULT_VALUE: SlideShowModel = {
     speed: 7,
-    running: false,
     pos: 0,
 }
 
 const SlideShow = atom<SlideShowModel>(DEFAULT_VALUE)
+global.slideshow_running = false
 
 const SlideShowAtom = atom(
     get => get(SlideShow),

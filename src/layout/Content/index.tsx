@@ -1,7 +1,13 @@
 import React, { FC, useEffect, useRef, useState } from 'react'
 
 import { useAtomValue, useSetAtom } from 'jotai'
-import { ActionsAtom, GeneralAtom, get_movement, PostAtom } from 'state'
+import {
+    ActionsAtom,
+    GeneralAtom,
+    get_movement,
+    PostAtom,
+    SlideShowAtom,
+} from 'state'
 
 import { Zoom } from 'components'
 
@@ -12,6 +18,7 @@ var loader_http: XMLHttpRequest | null = null
 
 const Content: FC = () => {
     const post = useAtomValue(PostAtom)
+    const slideshow = useAtomValue(SlideShowAtom)
     const general = useAtomValue(GeneralAtom)
     const register = useSetAtom(ActionsAtom)
 
@@ -224,8 +231,8 @@ const Content: FC = () => {
                     show_tags={state.overlay_info_tags}
                 />
 
-                <div className='slideshow_bar' style={{ display: 'none' }}>
-                    <div></div>
+                <div className='slideshow_bar'>
+                    <div style={{ width: slideshow.pos + '%' }}></div>
                 </div>
 
                 <Zoom source={post.type === 'video' ? video : image} />

@@ -1,6 +1,5 @@
 type SlideShow = {
     speed: number
-    running: boolean
     pos: number
 }
 
