@@ -18,8 +18,7 @@ import {
 
 const Info: FC = () => {
     const register = useSetAtom(ActionsAtom)
-    const [_AutoComplete, setAutoComplete] = useAtom(AutoCompleteAtom)
-    // global.AutoComplete = ACTS
+    const [AutoComplete, setAutoComplete] = useAtom(AutoCompleteAtom)
 
     const setPost = useSetAtom(PostAtom)
     const [general, setGeneral] = useAtom(GeneralAtom)
@@ -84,14 +83,14 @@ const Info: FC = () => {
                 func: () =>
                     updateState(state => {
                         if (
-                            _AutoComplete.tags.length < 1 ||
-                            _AutoComplete.index === -1 ||
+                            AutoComplete.tags.length < 1 ||
+                            AutoComplete.index === -1 ||
                             state.ac_index === -1 ||
                             state.input.length < 1
                         )
                             return state
 
-                        let tag = _AutoComplete.tags[_AutoComplete.index]
+                        let tag = AutoComplete.tags[AutoComplete.index]
                         setAutoComplete({ index: -1, tags: [] })
 
                         if (!tag) return state
@@ -112,7 +111,7 @@ const Info: FC = () => {
                     }),
             },
         })
-    }, [_AutoComplete])
+    }, [AutoComplete])
 
     useEffect(() => {
         if (!input.current) return
@@ -203,38 +202,32 @@ const Info: FC = () => {
                         })
                     }}
                 ></textarea>
-                {_AutoComplete.tags.length > 0 && (
+                {AutoComplete.tags.length > 0 && (
                     <ul className='autocomplete'>
-                        {_AutoComplete.tags.map(
-                            ({ type, name, count }, idx) => (
-                                <li
-                                    className={
-                                        type + C(_AutoComplete.index === idx)
-                                    }
-                                    key={idx + name}
-                                >
-                                    <span className='name'>
-                                        {name
-                                            .split(_AutoComplete.regQuery)
-                                            .map((s, sidx) => (
-                                                <Fragment key={sidx}>
-                                                    {s.toLocaleLowerCase() ===
-                                                    _AutoComplete.query ? (
-                                                        <mark>{s}</mark>
-                                                    ) : (
-                                                        s
-                                                    )}
-                                                </Fragment>
-                                            ))}
-                                    </span>
-                                    <span className='count'>
-                                        {count === -1
-                                            ? ''
-                                            : count.toLocaleString()}
-                                    </span>
-                                </li>
-                            )
-                        )}
+                        {AutoComplete.tags.map(({ type, name, count }, idx) => (
+                            <li
+                                className={type + C(AutoComplete.index === idx)}
+                                key={idx + name}
+                            >
+                                <span className='name'>
+                                    {name
+                                        .split(AutoComplete.regQuery)
+                                        .map((s, sidx) => (
+                                            <Fragment key={sidx}>
+                                                {s.toLocaleLowerCase() ===
+                                                AutoComplete.query ? (
+                                                    <mark>{s}</mark>
+                                                ) : (
+                                                    s
+                                                )}
+                                            </Fragment>
+                                        ))}
+                                </span>
+                                <span className='count'>
+                                    {count === -1 ? '' : count.toLocaleString()}
+                                </span>
+                            </li>
+                        ))}
                     </ul>
                 )}
 
