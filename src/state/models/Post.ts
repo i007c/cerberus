@@ -1,7 +1,7 @@
 type Rating = 'questionable' | 'safe' | 'explicit'
 
 type Post = {
-    type: 'image' | 'video' | 'gif' | 'null'
+    type: 'image' | 'video' | 'null'
     id: number
     parent?: number
     has_children: boolean

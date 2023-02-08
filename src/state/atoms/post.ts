@@ -1,3 +1,5 @@
+import { is_favorite } from 'utils'
+
 import { atom } from 'jotai'
 import {
     AutoCompleteModel,
@@ -24,9 +26,9 @@ const Post = atom<PostModel>(DEFAULT_POST)
 
 const PostAtom = atom(
     get => get(Post),
-    (get, set, args: SetArgs<PostModel>) => {
+    async (get, set, args: SetArgs<PostModel>) => {
         const state = get(Post)
-        const data = get_data(args, state)
+        const data = await get_data(args, state)
 
         if (state.type === 'null' && data.type === 'null') {
             // dont do anything
@@ -35,7 +37,7 @@ const PostAtom = atom(
 
         if (state.id !== data.id) {
             const general = get(GeneralAtom)
-            data.is_favorite = general.favorite_list.includes(data.id)
+            data.is_favorite = is_favorite(general, data.id)
         }
 
         set(Post, data)
@@ -53,8 +55,8 @@ const AutoComplete = atom<AutoCompleteModel>(DEFAULT_AC)
 
 const AutoCompleteAtom = atom(
     get => get(AutoComplete),
-    (get, set, args: SetArgs<AutoCompleteModel>) => {
-        let data = get_data(args, get(AutoComplete))
+    async (get, set, args: SetArgs<AutoCompleteModel>) => {
+        let data = await get_data(args, get(AutoComplete))
         data.index = 0
 
         set(AutoComplete, data)

@@ -3,11 +3,10 @@ import { PostModel, ServerModel } from 'state'
 type Mode = 'V' | 'O' | 'I' | 'Z' | 'C'
 type General = {
     mode: Mode
-    favorite_list: number[]
+    favorite_list: PostModel[]
     end_page: boolean
     original: boolean
     sort_score: boolean
-    isLocal: boolean
     page: number
     index: number
     posts: PostModel[]

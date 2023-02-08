@@ -9,7 +9,6 @@ const DEFAULT_VALUE: GeneralModel = {
     end_page: false,
     sort_score: false,
     original: false,
-    isLocal: false,
     page: 0,
     index: 0,
     posts: [],
@@ -20,8 +19,8 @@ const General = atom<GeneralModel>(DEFAULT_VALUE)
 
 const GeneralAtom = atom(
     get => get(General),
-    (get, set, args: SetArgs<GeneralModel>) => {
-        set(General, get_data(args, get(General)))
+    async (get, set, args: SetArgs<GeneralModel>) => {
+        set(General, await get_data(args, get(General)))
     }
 )
 

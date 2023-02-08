@@ -2,10 +2,14 @@ import React, { CSSProperties, FC, useEffect } from 'react'
 
 import { C } from '@00-team/utils'
 
-import { toggle_favorite_post } from 'utils'
-
-import { useAtomValue, useSetAtom } from 'jotai'
-import { ActionsAtom, GeneralAtom, PostAtom, SlideShowAtom } from 'state'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import {
+    ActionsAtom,
+    GeneralAtom,
+    PostAtom,
+    PostModel,
+    SlideShowAtom,
+} from 'state'
 
 type Props = {
     show: boolean
@@ -16,7 +20,7 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
     const register = useSetAtom(ActionsAtom)
     const setGeneral = useSetAtom(GeneralAtom)
     const general = useAtomValue(GeneralAtom)
-    const post = useAtomValue(PostAtom)
+    const [post, setPost] = useAtom(PostAtom)
     const slideshow = useAtomValue(SlideShowAtom)
 
     const main_style: CSSProperties = {
@@ -32,19 +36,36 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
             toggle_favorite_post: {
                 title: 'toggle favorite post',
                 func: () => {
-                    if (!post) return
+                    if (post.type === 'null' || !post.id) return
 
-                    setGeneral(async s => ({
-                        favorite_list: await toggle_favorite_post(
-                            s,
-                            s.server.name,
-                            post.id
-                        ),
-                    }))
+                    async function toggle() {
+                        let db: { [k: string]: PostModel[] } = {}
+
+                        db = (await chrome.storage.local.get('favorite_lists'))
+                            .favorite_lists
+
+                        console.log(general.server.name, db)
+
+                        db[general.server.name] = db[
+                            general.server.name
+                        ]!.filter(p => p.id !== post.id)
+
+                        if (!post.is_favorite) {
+                            db[general.server.name]!.push(post)
+                        }
+
+                        await chrome.storage.local.set({
+                            favorite_lists: db,
+                        })
+
+                        setGeneral({ favorite_list: db[general.server.name] })
+                        setPost({ is_favorite: !post.is_favorite })
+                    }
+                    toggle()
                 },
             },
         })
-    }, [post])
+    }, [general, post])
 
     return (
         <div className='overlay_info' style={main_style}>

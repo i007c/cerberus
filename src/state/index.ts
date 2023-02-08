@@ -15,13 +15,13 @@ export { SetArgs, get_data }
 
 type SetArgs<T> = Partial<T> | ((s: T) => Partial<T> | Promise<Partial<T>>)
 
-const get_data = <T>(args: SetArgs<T>, state: T): T => {
+const get_data = async <T>(args: SetArgs<T>, state: T): Promise<T> => {
     if (typeof args === 'function') {
         let data = {}
         let result = args(state)
 
         if (result instanceof Promise) {
-            result.then(v => (data = v))
+            data = await result
         } else {
             data = result
         }

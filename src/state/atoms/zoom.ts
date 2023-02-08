@@ -10,8 +10,8 @@ const Zoom = atom<ZoomModel>({
 
 const ZoomAtom = atom(
     get => get(Zoom),
-    (get, set, args: SetArgs<ZoomModel>) => {
-        set(Zoom, get_data(args, get(Zoom)))
+    async (get, set, args: SetArgs<ZoomModel>) => {
+        set(Zoom, await get_data(args, get(Zoom)))
     }
 )
 

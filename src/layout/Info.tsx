@@ -4,7 +4,7 @@ import { C } from '@00-team/utils'
 
 import { SERVERS } from 'servers'
 import { VIDEO_EXT } from 'servers/shared'
-import { load_favorite_list } from 'utils'
+import { get_favorite_list } from 'utils'
 
 import { useAtom, useSetAtom } from 'jotai'
 import {
@@ -67,9 +67,7 @@ const Info: FC = () => {
                     server.current.value = new_server.name
                     setGeneral({
                         server: new_server,
-                        favorite_list: await load_favorite_list(
-                            new_server.name
-                        ),
+                        favorite_list: await get_favorite_list(new_server.name),
                     })
                 },
             },
@@ -132,7 +130,6 @@ const Info: FC = () => {
                     setGeneral({
                         end_page: false,
                         mode: 'V',
-                        isLocal: false,
                         index: 0,
                         page: 0,
                     })
@@ -250,7 +247,7 @@ const Info: FC = () => {
                         const new_server = SERVERS[e.currentTarget.value]
                         setGeneral({
                             server: new_server,
-                            favorite_list: await load_favorite_list(
+                            favorite_list: await get_favorite_list(
                                 new_server.name
                             ),
                         })
@@ -296,7 +293,16 @@ const Info: FC = () => {
                             })
                         )
 
-                        setGeneral({ isLocal: true, page: 0, posts })
+                        console.log(posts.length)
+
+                        setGeneral(async s => ({
+                            end_page: true,
+                            page: 0,
+                            posts,
+                            favorite_list: await get_favorite_list(
+                                s.server.name
+                            ),
+                        }))
 
                         if (posts[0]) setPost(posts[0])
                     }}

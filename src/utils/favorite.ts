@@ -1,66 +1,30 @@
-import { GeneralModel } from 'state'
+import { SERVERS } from 'servers'
 
-async function load_favorite_list(server: string): Promise<number[]> {
-    let db = await chrome.storage.local.get('favorite_lists')
+import { GeneralModel, PostModel } from 'state'
 
-    if (db.favorite_lists === undefined) {
-        await chrome.storage.local.set({ favorite_lists: { [server]: [] } })
-        return []
-    }
+;(async () => {
+    let db = (await chrome.storage.local.get('favorite_lists')).favorite_lists
 
-    if (db.favorite_lists[server] === undefined) {
-        await chrome.storage.local.set({
-            favorite_lists: {
-                ...db.favorite_lists,
-                [server]: [],
-            },
-        })
+    if (typeof db !== 'object' || db === null) db = {}
 
-        return []
-    }
-
-    return db.favorite_lists[server]
-}
-
-async function toggle_favorite_post(
-    general: GeneralModel,
-    server: string,
-    post_id: number
-): Promise<number[]> {
-    if (general.isLocal) return general.favorite_list
-
-    let db = await chrome.storage.local.get('favorite_lists')
-
-    if (
-        db.favorite_lists === undefined ||
-        db.favorite_lists[server] === undefined
-    ) {
-        return general.favorite_list
-    }
-
-    let deleted = false
-
-    let fav_list = general.favorite_list.filter(pid => {
-        if (pid === post_id) {
-            deleted = true
-            return false
+    Object.values(SERVERS).map(server => {
+        if (!Array.isArray(db[server.name])) {
+            db[server.name] = []
         }
-
-        return true
     })
-
-    if (!deleted) {
-        fav_list.push(post_id)
-    }
 
     await chrome.storage.local.set({
-        favorite_lists: {
-            ...db.favorite_lists,
-            [server]: fav_list,
-        },
+        favorite_lists: db,
     })
+})()
 
-    return fav_list
+async function get_favorite_list(server: string): Promise<PostModel[]> {
+    return (await chrome.storage.local.get('favorite_lists')).favorite_lists[
+        server
+    ]
 }
 
-export { toggle_favorite_post, load_favorite_list }
+const is_favorite = (general: GeneralModel, id: number) =>
+    !!general.favorite_list.find(v => v.id == id)
+
+export { is_favorite, get_favorite_list }

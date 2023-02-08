@@ -11,8 +11,8 @@ global.slideshow_running = false
 
 const SlideShowAtom = atom(
     get => get(SlideShow),
-    (get, set, args: SetArgs<SlideShowModel>) => {
-        set(SlideShow, get_data(args, get(SlideShow)))
+    async (get, set, args: SetArgs<SlideShowModel>) => {
+        set(SlideShow, await get_data(args, get(SlideShow)))
     }
 )
 

@@ -22,42 +22,6 @@ const KeyBinding: FC = () => {
         setGeneral({ mode: 'V' })
     }
 
-    const change_content = (movement: number) => {
-        if (general.posts.length === 0) {
-            setGeneral({ index: 0 })
-            setPost({ type: 'null', id: 0 })
-            return
-        }
-
-        let index = general.index
-        index += movement
-
-        if (index >= general.posts.length) {
-            index = 0
-
-            // if (!general.isLocal && !State.end_page) {
-            //     State.page++
-            //     search()
-            //     return
-            // }
-        } else if (index < 0) {
-            index = general.posts.length - 1
-        }
-
-        if (index !== general.index) {
-            setGeneral({ index })
-            setPost(general.posts[index] || { type: 'null', id: 0 })
-            // setSlideShow({ pos: 0 })
-
-            // if (slideshow_running) {
-            //     slideshow_running = false
-            //     setTimeout(() => {
-            //         run_slideshow()
-            //     }, 500)
-            // }
-        }
-    }
-
     // const run_slideshow = () => {
     //     slideshow_running = true
 
@@ -100,7 +64,43 @@ const KeyBinding: FC = () => {
             content_movement: {
                 title: 'go to the next or previous post',
                 func: (_, args) => {
-                    change_content(get_movement(args))
+                    const update = get_movement(args)
+
+                    console.log(general.posts.length)
+
+                    if (general.posts.length === 0) {
+                        setGeneral({ index: 0 })
+                        setPost({ type: 'null', id: 0 })
+                        return
+                    }
+
+                    let index = general.index
+                    index += update
+
+                    if (index >= general.posts.length) {
+                        index = 0
+
+                        // if (!general.isLocal && !State.end_page) {
+                        //     State.page++
+                        //     search()
+                        //     return
+                        // }
+                    } else if (index < 0) {
+                        index = general.posts.length - 1
+                    }
+
+                    if (index !== general.index) {
+                        setGeneral({ index })
+                        setPost(general.posts[index] || { type: 'null', id: 0 })
+                        // setSlideShow({ pos: 0 })
+
+                        // if (slideshow_running) {
+                        //     slideshow_running = false
+                        //     setTimeout(() => {
+                        //         run_slideshow()
+                        //     }, 500)
+                        // }
+                    }
                 },
             },
         })
@@ -138,8 +138,8 @@ const KeyBinding: FC = () => {
             copy_post_id: {
                 title: 'copy post id',
                 func: () => {
-                    if (post.type === 'null') return setGeneral({ mode: 'V' })
-                    copy(post.id)
+                    if (post.type === 'null') setGeneral({ mode: 'V' })
+                    else copy(post.id)
                 },
             },
             copy_parent_id: {
@@ -154,8 +154,8 @@ const KeyBinding: FC = () => {
             copy_tags: {
                 title: 'copy tags',
                 func: () => {
-                    if (post.type === 'null') return setGeneral({ mode: 'V' })
-                    copy(post.tags.join(' '))
+                    if (post.type === 'null') setGeneral({ mode: 'V' })
+                    else copy(post.tags.join(' '))
                 },
             },
         })
