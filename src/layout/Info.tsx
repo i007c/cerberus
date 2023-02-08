@@ -293,9 +293,7 @@ const Info: FC = () => {
                             })
                         )
 
-                        console.log(posts.length)
-
-                        setGeneral(async s => ({
+                        await setGeneral(async s => ({
                             end_page: true,
                             page: 0,
                             posts,

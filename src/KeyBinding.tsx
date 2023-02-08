@@ -1,5 +1,7 @@
 import React, { FC, useEffect } from 'react'
 
+import { get_favorite_list } from 'utils'
+
 import { useAtom } from 'jotai'
 import {
     ActionsAtom,
@@ -65,8 +67,6 @@ const KeyBinding: FC = () => {
                 title: 'go to the next or previous post',
                 func: (_, args) => {
                     const update = get_movement(args)
-
-                    console.log(general.posts.length)
 
                     if (general.posts.length === 0) {
                         setGeneral({ index: 0 })
@@ -196,7 +196,29 @@ const KeyBinding: FC = () => {
                 title: 'load original file',
                 func: () => setPost({ force_original: true }),
             },
+            load_local_favorites: {
+                title: 'load the local favorites. if any',
+                func: async () => {
+                    setGeneral(s => {
+                        if (s.favorite_list.length == 0) return {}
+
+                        setPost(s.favorite_list[0]!)
+
+                        return {
+                            end_page: true,
+                            page: 0,
+                            index: 0,
+                            mode: 'V',
+                            posts: s.favorite_list,
+                        }
+                    })
+                },
+            },
         })
+
+        setGeneral(async s => ({
+            favorite_list: await get_favorite_list(s.server.name),
+        }))
     }, [])
 
     useEffect(() => {
@@ -323,6 +345,7 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
     'O-KeyS-0-0-0-0': [['toggle_sort_score', []]],
     'O-KeyD-0-0-0-0': [['change_server', [+1]]],
     'O-KeyA-0-0-0-0': [['change_server', [-1]]],
+    'O-KeyR-0-0-0-0': [['load_local_favorites', []]],
 
     // insert mode
     'I-Enter-0-0-0-0': [['search', []]],

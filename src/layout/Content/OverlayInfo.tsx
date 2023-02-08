@@ -35,33 +35,28 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
         register({
             toggle_favorite_post: {
                 title: 'toggle favorite post',
-                func: () => {
+                func: async () => {
                     if (post.type === 'null' || !post.id) return
 
-                    async function toggle() {
-                        let db: { [k: string]: PostModel[] } = {}
+                    let db: { [k: string]: PostModel[] } = {}
 
-                        db = (await chrome.storage.local.get('favorite_lists'))
-                            .favorite_lists
+                    db = (await chrome.storage.local.get('favorite_lists'))
+                        .favorite_lists
 
-                        console.log(general.server.name, db)
+                    db[general.server.name] = db[general.server.name]!.filter(
+                        p => p.id !== post.id
+                    )
 
-                        db[general.server.name] = db[
-                            general.server.name
-                        ]!.filter(p => p.id !== post.id)
-
-                        if (!post.is_favorite) {
-                            db[general.server.name]!.push(post)
-                        }
-
-                        await chrome.storage.local.set({
-                            favorite_lists: db,
-                        })
-
-                        setGeneral({ favorite_list: db[general.server.name] })
-                        setPost({ is_favorite: !post.is_favorite })
+                    if (!post.is_favorite) {
+                        db[general.server.name]!.push(post)
                     }
-                    toggle()
+
+                    await chrome.storage.local.set({
+                        favorite_lists: db,
+                    })
+
+                    setGeneral({ favorite_list: db[general.server.name] })
+                    setPost({ is_favorite: !post.is_favorite })
                 },
             },
         })
@@ -75,7 +70,7 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                     flexDirection: show_tags ? 'row' : 'column',
                 }}
             >
-                {post.type !== 'null' ? (
+                {post.type !== 'null' && (
                     <>
                         <span className='type'>
                             {post.type}/{post.ext}
@@ -84,10 +79,12 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                             {post.id}
                             {post.is_favorite ? ' 🩷' : ''}
                         </span>
-                        {post.parent && (
+                        {post.parent ? (
                             <span className='parent'>
                                 parent: {post.parent}
                             </span>
+                        ) : (
+                            <></>
                         )}
                         {post.score !== -1 && (
                             <span className='score'>{post.score}</span>
@@ -95,13 +92,6 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                         <span className={'rating ' + post.rating}>
                             {post.rating}
                         </span>
-                    </>
-                ) : (
-                    <>
-                        <span className='type'>N/A</span>
-                        <span className='id'>N/A</span>
-                        <span className='score'>N/A</span>
-                        <span className='rating'>N/A</span>
                     </>
                 )}
 
