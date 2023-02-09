@@ -12,12 +12,23 @@ type Props = {
 var AbortVideoRender: NodeJS.Timeout | null = null
 var draw: DrawFunc = _ => console.log('not set')
 
-const Zoom: FC<Props> = ({ source }) => {
+const Zoom: FC<Props> = ({ source: src }) => {
     const [zoom, setZoom] = useAtom(ZoomAtom)
     const register = useSetAtom(ActionsAtom)
     const post = useAtomValue(PostAtom)
     const general = useAtomValue(GeneralAtom)
     const ref = useRef<HTMLCanvasElement>(null)
+    const source = src.current
+    let width = 0,
+        height = 0
+
+    if (source instanceof HTMLVideoElement) {
+        width = source.videoWidth
+        height = source.videoHeight
+    } else if (source instanceof HTMLImageElement) {
+        width = source.naturalWidth
+        height = source.naturalHeight
+    }
 
     useEffect(() => {
         register({
@@ -45,15 +56,16 @@ const Zoom: FC<Props> = ({ source }) => {
                     setZoom(s => {
                         let value = s[axis] + (dir * s.speed) / s.level
 
+                        // FIXME: zoom bug
                         let max = 0
                         let min = 0
 
                         if (ref.current && axis === 'x') {
-                            max = ref.current.width - 20
-                            min = (ref.current.width * -10) / s.level + 20
+                            max = width - 20
+                            min = (width * -10) / s.level + 20
                         } else if (ref.current && axis === 'y') {
-                            max = ref.current.height - 20
-                            min = (ref.current.height * -10) / s.level + 20
+                            max = height - 20
+                            min = (height * -10) / s.level + 20
                         }
 
                         if (value < min) value = min
@@ -125,36 +137,41 @@ const Zoom: FC<Props> = ({ source }) => {
         }
 
         const canvas = ref.current
-        const src = source.current
 
-        if (!src || !canvas) return
+        if (!source || !canvas) return
 
-        if (src instanceof HTMLImageElement) {
-            draw = draw_image(src, canvas)
+        if (source instanceof HTMLImageElement) {
+            draw = draw_image(source, canvas)
             setZoom({
-                speed: Math.round((src.naturalWidth + src.naturalHeight) / 20),
+                speed: Math.round(
+                    (source.naturalWidth + source.naturalHeight) / 20
+                ),
             })
 
-            src.onload = () => {
-                draw = draw_image(src, canvas)
+            source.onload = () => {
+                draw = draw_image(source, canvas)
                 setZoom({
                     speed: Math.round(
-                        (src.naturalWidth + src.naturalHeight) / 20
+                        (source.naturalWidth + source.naturalHeight) / 20
                     ),
                 })
                 draw(zoom)
             }
         } else {
-            draw = draw_video(src, canvas)
+            draw = draw_video(source, canvas)
 
             setZoom({
-                speed: Math.round((src.videoWidth + src.videoHeight) / 20),
+                speed: Math.round(
+                    (source.videoWidth + source.videoHeight) / 20
+                ),
             })
 
-            src.onloadeddata = () => {
-                draw = draw_video(src, canvas)
+            source.onloadeddata = () => {
+                draw = draw_video(source, canvas)
                 setZoom({
-                    speed: Math.round((src.videoWidth + src.videoHeight) / 20),
+                    speed: Math.round(
+                        (source.videoWidth + source.videoHeight) / 20
+                    ),
                 })
                 draw(zoom)
             }

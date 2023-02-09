@@ -184,11 +184,9 @@ const Content: FC = () => {
                     />
                 )}
 
-                {post.type === 'image' && (
+                {post.type === 'image' && state.image && (
                     <img ref={image} className='main' src={state.image} />
                 )}
-
-                {post.type === 'null' && <>None</>}
 
                 {state.show_volume && (
                     <div className='volume'>
