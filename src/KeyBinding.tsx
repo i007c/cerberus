@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react'
 
-import { get_favorite_list } from 'utils'
+import { get_favorite_list, now_iso } from 'utils'
 
 import { useAtom } from 'jotai'
 import {
@@ -214,6 +214,23 @@ const KeyBinding: FC = () => {
                     })
                 },
             },
+            export_local_favorites: {
+                title: 'export local favorites',
+                func: async () => {
+                    const favorites = JSON.stringify(
+                        (await chrome.storage.local.get('favorite_lists'))
+                            .favorite_lists
+                    )
+                    const url = URL.createObjectURL(
+                        new Blob([favorites], { type: 'application/json' })
+                    )
+
+                    await chrome.downloads.download({
+                        url,
+                        filename: `cerberus-favorites-export_${now_iso()}.json`,
+                    })
+                },
+            },
         })
 
         setGeneral(async s => ({
@@ -346,6 +363,8 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
     'O-KeyD-0-0-0-0': [['change_server', [+1]]],
     'O-KeyA-0-0-0-0': [['change_server', [-1]]],
     'O-KeyR-0-0-0-0': [['load_local_favorites', []]],
+    'O-KeyG-0-0-0-0': [['export_local_favorites', []]],
+    'O-KeyH-0-0-0-0': [['import_local_favorites', []]],
 
     // insert mode
     'I-Enter-0-0-0-0': [['search', []]],

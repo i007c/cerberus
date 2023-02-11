@@ -4,7 +4,7 @@ import { C } from '@00-team/utils'
 
 import { SERVERS } from 'servers'
 import { VIDEO_EXT } from 'servers/shared'
-import { get_favorite_list } from 'utils'
+import { get_favorite_list, is_post } from 'utils'
 
 import { useAtom, useSetAtom } from 'jotai'
 import {
@@ -32,6 +32,7 @@ const Info: FC = () => {
         updateState(s => ({ ...s, ...args }))
 
     const local_file = useRef<HTMLInputElement>(null)
+    const import_file = useRef<HTMLInputElement>(null)
     const server = useRef<HTMLSelectElement>(null)
     const input = useRef<HTMLTextAreaElement>(null)
 
@@ -69,6 +70,15 @@ const Info: FC = () => {
                         server: new_server,
                         favorite_list: await get_favorite_list(new_server.name),
                     })
+                },
+            },
+            import_local_favorites: {
+                title: 'import local favorites',
+                func: async () => {
+                    if (!import_file.current) return
+                    document.dispatchEvent(ClearActiveKeys)
+
+                    import_file.current.click()
                 },
             },
         })
@@ -303,6 +313,48 @@ const Info: FC = () => {
                         }))
 
                         if (posts[0]) setPost(posts[0])
+                    }}
+                />
+                <input
+                    ref={import_file}
+                    type='file'
+                    className='local-file'
+                    onChange={async e => {
+                        const file =
+                            e.currentTarget.files && e.currentTarget.files[0]
+                        if (!file || file.type !== 'application/json') return
+
+                        const data = JSON.parse(await file.text())
+                        const favorites = (
+                            await chrome.storage.local.get('favorite_lists')
+                        ).favorite_lists
+
+                        Object.entries<PostModel[]>(favorites).forEach(
+                            ([key, value]) => {
+                                const posts = data[key]
+                                if (!Array.isArray(posts)) return
+
+                                favorites[key] = value.concat(
+                                    posts.filter(post => {
+                                        if (!is_post(post)) return false
+
+                                        return (
+                                            value.find(
+                                                p => p.id === post.id
+                                            ) === undefined
+                                        )
+                                    })
+                                )
+                            }
+                        )
+
+                        await chrome.storage.local.set({
+                            favorite_lists: favorites,
+                        })
+
+                        if (import_file.current) {
+                            import_file.current.value = ''
+                        }
                     }}
                 />
             </div>
