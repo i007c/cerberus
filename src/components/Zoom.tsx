@@ -32,6 +32,46 @@ const Zoom: FC<Props> = ({ source: src }) => {
 
     useEffect(() => {
         register({
+            change_zoom_speed: {
+                title: 'change zoom speed',
+                func: (_, args) => {
+                    let speed = args[0]
+
+                    setZoom(s => {
+                        if (typeof speed !== 'number') return {}
+                        if (!args[1]) {
+                            speed = s.speed + speed
+                        }
+
+                        if (speed < 1) speed = 1
+
+                        return { speed }
+                    })
+                },
+            },
+            change_zoom_level: {
+                title: 'change zoom level',
+                func: (_, args) => {
+                    let level = args[0]
+
+                    setZoom(s => {
+                        if (typeof level !== 'number') return {}
+
+                        if (!args[1]) {
+                            level = s.level + level
+                        }
+
+                        draw({ ...s, level })
+
+                        return { level }
+                    })
+                },
+            },
+        })
+    }, [])
+
+    useEffect(() => {
+        register({
             change_zoom_pos: {
                 title: 'change zoom position',
                 func: (_, args) => {
@@ -56,16 +96,15 @@ const Zoom: FC<Props> = ({ source: src }) => {
                     setZoom(s => {
                         let value = s[axis] + (dir * s.speed) / s.level
 
-                        // FIXME: zoom bug
                         let max = 0
                         let min = 0
 
                         if (ref.current && axis === 'x') {
                             max = width - 20
-                            min = (width * -10) / s.level + 20
+                            min = (ref.current.width * -10) / s.level + 20
                         } else if (ref.current && axis === 'y') {
                             max = height - 20
-                            min = (height * -10) / s.level + 20
+                            min = (ref.current.height * -10) / s.level + 20
                         }
 
                         if (value < min) value = min
@@ -79,52 +118,20 @@ const Zoom: FC<Props> = ({ source: src }) => {
                     })
                 },
             },
-            change_zoom_speed: {
-                title: 'change zoom speed',
-                func: (_, args) => {
-                    let speed = args[0]
-
-                    setZoom(s => {
-                        if (typeof speed !== 'number') return {}
-                        if (!args[1]) {
-                            speed = s.speed + speed
-                        }
-
-                        if (speed < 1) speed = 1
-
-                        return { speed }
-                    })
-                },
-            },
             set_zoom_comic: {
                 title: 'set zoom to comic view',
                 func: () => {
                     setZoom(s => {
-                        draw({ ...s, level: 10, x: 0 })
-                        return { level: 10, x: 0 }
-                    })
-                },
-            },
-            change_zoom_level: {
-                title: 'change zoom level',
-                func: (_, args) => {
-                    let level = args[0]
+                        let x = 0
+                        if (ref.current) x = -((ref.current.width - width) / 2)
 
-                    setZoom(s => {
-                        if (typeof level !== 'number') return {}
-
-                        if (!args[1]) {
-                            level = s.level + level
-                        }
-
-                        draw({ ...s, level })
-
-                        return { level }
+                        draw({ ...s, level: 10, x })
+                        return { level: 10, x }
                     })
                 },
             },
         })
-    }, [])
+    }, [width, height])
 
     useEffect(() => {
         if (general.mode !== 'Z') {
