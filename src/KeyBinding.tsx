@@ -10,56 +10,17 @@ import {
     KeyBindModel,
     Mode,
     PostAtom,
-    SlideShowAtom,
 } from 'state'
 
 const KeyBinding: FC = () => {
     const [Actions, register] = useAtom(ActionsAtom)
     const [general, setGeneral] = useAtom(GeneralAtom)
     const [post, setPost] = useAtom(PostAtom)
-    const [slideshow, setSlideShow] = useAtom(SlideShowAtom)
 
     const copy = (text: string | number) => {
         navigator.clipboard.writeText(`${text}`)
         setGeneral({ mode: 'V' })
     }
-
-    // const run_slideshow = () => {
-    //     slideshow_running = true
-
-    //     let _speed = slideshow.speed
-    //     let total = slideshow.speed * 1000
-    //     let start = performance.now()
-    //     let progress = 0
-
-    //     if (slideshow.pos) {
-    //         start = start - (total / 100) * slideshow.pos
-    //     }
-
-    //     function anime() {
-    //         if (!slideshow_running) return
-
-    //         if (_speed !== slideshow.speed) {
-    //             total = slideshow.speed * 1000
-    //             _speed = slideshow.speed
-    //             console.log('speed change')
-    //         }
-
-    //         progress = performance.now() - start
-
-    //         setSlideShow({ pos: (100 / total) * progress })
-
-    //         // restart
-    //         if (progress > total) {
-    //             start = performance.now()
-    //             change_content(+1)
-    //         }
-
-    //         requestAnimationFrame(anime)
-    //     }
-
-    //     requestAnimationFrame(anime)
-    // }
 
     useEffect(() => {
         register({
@@ -92,14 +53,6 @@ const KeyBinding: FC = () => {
                     if (index !== general.index) {
                         setGeneral({ index })
                         setPost(general.posts[index] || { type: 'null', id: 0 })
-                        // setSlideShow({ pos: 0 })
-
-                        // if (slideshow_running) {
-                        //     slideshow_running = false
-                        //     setTimeout(() => {
-                        //         run_slideshow()
-                        //     }, 500)
-                        // }
                     }
                 },
             },
@@ -168,22 +121,6 @@ const KeyBinding: FC = () => {
                 func: (_, args) => {
                     const mode = `${args[0]}`.toUpperCase()
                     if (check_mode(mode)) setGeneral({ mode })
-                },
-            },
-            slideshow_speed: {
-                title: 'update slieshow speed',
-                func: (_, args) => {
-                    const update = get_movement(args)
-
-                    setSlideShow(s => {
-                        if (s.speed + update < 1) {
-                            return { speed: 0.3 }
-                        }
-
-                        return { speed: Math.floor(s.speed + update) }
-                    })
-
-                    // if (slideshow_running) run_slideshow()
                 },
             },
             toggle_load_original: {
@@ -260,27 +197,14 @@ const KeyBinding: FC = () => {
     }, [])
 
     useEffect(() => {
-        register({
-            toggle_slideshow: {
-                title: 'toggle slideshow',
-                func: () => {
-                    // if (slideshow_running || post.type !== 'image') {
-                    //     slideshow_running = false
-                    //     return
-                    // }
-                    // run_slideshow()
-                },
-            },
-        })
-    }, [slideshow, post])
-
-    useEffect(() => {
         // Object.keys(Actions).forEach(key => console.log(key))
 
         function keydown(e: KeyboardEvent) {
-            ActiveKeys[e.code] =
+            ActiveKeys.set(
+                e.code,
                 `${e.code}-${B2B(e.altKey)}-${B2B(e.ctrlKey)}-` +
-                `${B2B(e.metaKey)}-${B2B(e.shiftKey)}`
+                    `${B2B(e.metaKey)}-${B2B(e.shiftKey)}`
+            )
 
             Object.values(ActiveKeys).forEach(key => {
                 const keybinds = (
@@ -314,14 +238,15 @@ const KeyBinding: FC = () => {
     return <></>
 }
 
-var ActiveKeys: { [k: string]: string } = {}
+// var ActiveKeys: { [k: string]: string } = {}
+var ActiveKeys = new Map<string, string>()
 
 document.addEventListener('clear_active_keys', () => {
-    ActiveKeys = {}
+    ActiveKeys.clear()
 })
 
 document.addEventListener('keyup', e => {
-    delete ActiveKeys[e.code]
+    ActiveKeys.delete(e.code)
 })
 
 global.ClearActiveKeys = new CustomEvent('clear_active_keys')
@@ -343,15 +268,8 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
     'V-KeyC-0-0-0-0': [['set_mode', ['C']]],
     'V-KeyZ-0-0-0-0': [['set_mode', ['Z']]],
     'V-KeyO-0-0-0-0': [['set_mode', ['O']]],
-    'V-Space-0-0-0-0': [
-        ['toggle_video_playing', []],
-        ['toggle_slideshow', []],
-    ],
+    'V-Space-0-0-0-0': [['toggle_video_playing', []]],
     'V-KeyF-0-0-0-0': [['toggle_fullscreen', []]],
-    'V-Minus-0-0-0-0': [['slideshow_speed', [-1]]],
-    'V-Digit1-0-0-0-0': [['slideshow_speed', [-1]]],
-    'V-Equal-0-0-0-0': [['slideshow_speed', [1]]],
-    'V-Digit3-0-0-0-0': [['slideshow_speed', [1]]],
     'V-KeyD-0-0-0-0': [['content_movement', [+1]]],
     'V-KeyA-0-0-0-0': [['content_movement', [-1]]],
     'V-KeyW-0-0-0-0': [['content_movement', [+10]]],
