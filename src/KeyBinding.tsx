@@ -231,6 +231,27 @@ const KeyBinding: FC = () => {
                     })
                 },
             },
+            remove_post: {
+                title: 'remove the current post',
+                func: () => {
+                    setGeneral(g => {
+                        let idx = g.index
+                        g.posts.splice(idx, 1)
+                        idx--
+
+                        if (g.posts.length == 0) {
+                            g.index = 0
+                            setPost({ type: 'null', id: 0 })
+                            return { posts: [], index: 0 }
+                        }
+
+                        if (idx < 0) idx = g.posts.length
+
+                        setPost(g.posts[idx]!)
+                        return { index: idx, posts: g.posts }
+                    })
+                },
+            },
         })
 
         setGeneral(async s => ({
@@ -340,6 +361,7 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
     'V-KeyR-0-0-0-0': [['toggle_favorite_post', []]],
     'V-KeyU-0-0-0-0': [['open_current_post', []]],
     'V-KeyY-0-0-0-0': [['toggle_load_original', []]],
+    'V-KeyX-0-0-0-0': [['remove_post', []]],
     // with shift
     'V-KeyF-0-0-0-1': [['load_original', []]],
     'V-KeyN-0-0-0-1': [['open_original', []]],
