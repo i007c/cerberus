@@ -34,8 +34,6 @@ function render_content() {
         update_plate_image(State.post.file)
     }
 
-    if (!plate_image.complete) State.slideshow.running = false
-
     if (CACHE_CTRL) {
         CACHE_CTRL.abort()
     }
@@ -86,8 +84,5 @@ async function cache_content(signal: AbortSignal) {
     }
 }
 
-function slideshow() {}
-
 export { search }
 export { render_content }
-export { slideshow }

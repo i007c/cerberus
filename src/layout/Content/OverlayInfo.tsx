@@ -1,16 +1,7 @@
 import React, { CSSProperties, FC, useEffect } from 'react'
 
-import { C } from '@00-team/utils'
-
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
-import {
-    ActionsAtom,
-    GeneralAtom,
-    PostAtom,
-    PostModel,
-    SlideShowAtom,
-    ZoomAtom,
-} from 'state'
+import { ActionsAtom, GeneralAtom, PostAtom, PostModel, ZoomAtom } from 'state'
 
 type Props = {
     show: boolean
@@ -22,7 +13,6 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
     const setGeneral = useSetAtom(GeneralAtom)
     const general = useAtomValue(GeneralAtom)
     const [post, setPost] = useAtom(PostAtom)
-    const slideshow = useAtomValue(SlideShowAtom)
     const zoom = useAtomValue(ZoomAtom)
 
     const main_style: CSSProperties = {
@@ -103,9 +93,6 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
 
                 <span className='index'>
                     {general.index + 1}/{general.posts.length} | {general.page}
-                </span>
-                <span className={'slideshow' + C(slideshow_running, 'running')}>
-                    {slideshow.speed}
                 </span>
 
                 {general.mode == 'Z' && (
