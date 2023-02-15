@@ -37,6 +37,7 @@ type Server = {
     limit: number
     autocomplete: null | ((query: string) => Promise<AutoCompleteTag[]>)
     search: (tags: string, page: number) => Promise<Post[]>
+    open_tags: (tags: string) => void
 }
 
 export {

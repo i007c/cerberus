@@ -15,7 +15,7 @@ const rule34: ServerModel = {
     limit: 500,
     sort_score: 'sort:score',
 
-    autocomplete: async query => {
+    async autocomplete(query) {
         ACAC.abort()
         ACAC = new AbortController()
 
@@ -41,7 +41,7 @@ const rule34: ServerModel = {
             }
         })
     },
-    search: async function (tags, page) {
+    async search(tags, page) {
         ACAC.abort()
         let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&limit=${this.limit}`
         url += '&q=index&pid=' + page
@@ -101,6 +101,9 @@ const rule34: ServerModel = {
         })
 
         return data
+    },
+    open_tags(tags) {
+        open('https://rule34.xxx/index.php?page=post&s=list&tags=' + tags)
     },
 }
 

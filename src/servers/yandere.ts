@@ -102,6 +102,9 @@ const yandere: ServerModel = {
             }
         })
     },
+    open_tags(tags) {
+        open('https://yande.re/post?tags=' + tags)
+    },
 }
 
 export { yandere }

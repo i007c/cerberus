@@ -28,7 +28,7 @@ const gelbooru: ServerModel = {
     limit: 100,
     sort_score: 'sort:score',
 
-    autocomplete: async query => {
+    async autocomplete(query) {
         ACAC.abort()
         ACAC = new AbortController()
 
@@ -48,7 +48,7 @@ const gelbooru: ServerModel = {
             count: parseInt(post_count),
         }))
     },
-    search: async function (tags, page) {
+    async search(tags, page) {
         ACAC.abort()
         let url = 'https://gelbooru.com/index.php?page=dapi&s=post&json=1'
         url += '&q=index&pid=' + page
@@ -87,6 +87,9 @@ const gelbooru: ServerModel = {
                 link: `https://gelbooru.com/index.php?page=post&s=view&id=${post.id}`,
             }
         })
+    },
+    open_tags(tags) {
+        open('https://gelbooru.com/index.php?page=post&s=list&tags=' + tags)
     },
 }
 

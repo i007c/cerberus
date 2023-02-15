@@ -43,7 +43,7 @@ const realbooru: ServerModel = {
             count: -1,
         }))
     },
-    search: async function (tags, page) {
+    async search(tags, page) {
         ACAC.abort()
         let url = `https://realbooru.com/index.php?page=dapi&s=post&limit=${this.limit}`
         url += '&json=1&q=index&pid=' + page
@@ -88,6 +88,9 @@ const realbooru: ServerModel = {
         })
 
         return data
+    },
+    open_tags(tags) {
+        open('https://realbooru.com/index.php?page=post&s=list&tags=' + tags)
     },
 }
 

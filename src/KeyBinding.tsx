@@ -365,6 +365,7 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
     'O-KeyR-0-0-0-0': [['load_local_favorites', []]],
     'O-KeyG-0-0-0-0': [['export_local_favorites', []]],
     'O-KeyH-0-0-0-0': [['import_local_favorites', []]],
+    'O-KeyU-0-0-0-0': [['open_tags', []]],
 
     // insert mode
     'I-Enter-0-0-0-0': [['search', []]],

@@ -157,6 +157,22 @@ const Info: FC = () => {
                     setPost(new_posts[0] || { type: 'null', id: 0 })
                 },
             },
+            open_tags: {
+                title: 'open search tags',
+                func: () => {
+                    if (!input.current) return
+
+                    document.dispatchEvent(ClearActiveKeys)
+
+                    let tags = input.current.value
+
+                    if (general.sort_score) {
+                        tags += ' ' + general.server.sort_score
+                    }
+
+                    general.server.open_tags(tags)
+                },
+            },
         })
     }, [general])
 

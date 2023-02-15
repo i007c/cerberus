@@ -3,7 +3,7 @@ import { AutoCompleteTag, PostModel, ServerModel } from 'state'
 import { Parser } from './shared'
 import tags from './tentaclerape.tags.json'
 
-const BASE = 'https://tentaclerape.net/'
+const BASE = 'https://tentaclerape.net'
 
 const tentaclerape: ServerModel = {
     name: 'tentaclerape',
@@ -57,7 +57,7 @@ const tentaclerape: ServerModel = {
             data.push({
                 id,
                 link: BASE + e.getAttribute('href'),
-                file: `${BASE}index.php?q=/image/${id}`,
+                file: `${BASE}/index.php?q=/image/${id}`,
                 sample: BASE + e.querySelector('img')!.getAttribute('src'),
                 ext: 'png',
                 has_children: false,
@@ -69,6 +69,9 @@ const tentaclerape: ServerModel = {
         })
 
         return data
+    },
+    open_tags(tags) {
+        open('https://tentaclerape.net/post/list/' + tags + '/1')
     },
 }
 

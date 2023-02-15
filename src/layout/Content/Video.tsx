@@ -1,5 +1,8 @@
 import React, { FC, RefObject, useEffect } from 'react'
 
+import { useAtomValue } from 'jotai'
+import { ActionsAtom } from 'state'
+
 var volume_timeout: NodeJS.Timeout | null = null
 
 type Props = {
@@ -14,6 +17,8 @@ const Video: FC<Props> = ({ file, videoRef, setState }) => {
 
         videoRef.current.volume = 0.2
     }, [videoRef])
+
+    const Actions = useAtomValue(ActionsAtom)
 
     return (
         <video
@@ -56,6 +61,11 @@ const Video: FC<Props> = ({ file, videoRef, setState }) => {
                         (100 / e.currentTarget.duration) *
                         e.currentTarget.currentTime,
                 })
+            }}
+            onEnded={e => {
+                if (!e.currentTarget.loop && Actions.content_movement) {
+                    Actions.content_movement.func({} as KeyboardEvent, [+1])
+                }
             }}
         ></video>
     )
