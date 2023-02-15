@@ -40,6 +40,7 @@ const PostAtom = atom(
         if (state.id !== data.id) {
             const general = get(GeneralAtom)
             data.is_favorite = is_favorite(general, data.id)
+            data.force_original = false
         }
 
         set(Post, data)
