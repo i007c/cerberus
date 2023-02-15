@@ -70,7 +70,11 @@ const Zoom: FC<Props> = ({ source: src }) => {
         })
     }, [])
 
+    const setPost = useSetAtom(PostAtom)
+
     useEffect(() => {
+        setPost({ width, height })
+
         register({
             change_zoom_pos: {
                 title: 'change zoom position',

@@ -9,6 +9,7 @@ import {
     PostAtom,
     PostModel,
     SlideShowAtom,
+    ZoomAtom,
 } from 'state'
 
 type Props = {
@@ -22,6 +23,7 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
     const general = useAtomValue(GeneralAtom)
     const [post, setPost] = useAtom(PostAtom)
     const slideshow = useAtomValue(SlideShowAtom)
+    const zoom = useAtomValue(ZoomAtom)
 
     const main_style: CSSProperties = {
         display: show ? '' : 'none',
@@ -75,6 +77,9 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                         <span className='type'>
                             {post.type}/{post.ext}
                         </span>
+                        <span>
+                            {post.width}px / {post.height}px
+                        </span>
                         <span className='id'>
                             {post.id}
                             {post.is_favorite ? ' 🩷' : ''}
@@ -86,6 +91,7 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                         ) : (
                             <></>
                         )}
+
                         {post.score !== -1 && (
                             <span className='score'>{post.score}</span>
                         )}
@@ -101,6 +107,13 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                 <span className={'slideshow' + C(slideshow_running, 'running')}>
                     {slideshow.speed}
                 </span>
+
+                {general.mode == 'Z' && (
+                    <span>
+                        {zoom.speed}s / {zoom.level}z / {Math.round(zoom.x)}x /{' '}
+                        {Math.round(zoom.y)}y
+                    </span>
+                )}
             </div>
 
             {show_tags && post.type !== 'null' && (

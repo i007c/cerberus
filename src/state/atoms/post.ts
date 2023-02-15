@@ -20,6 +20,8 @@ const DEFAULT_POST: PostModel = {
     file: '',
     sample: '',
     link: '',
+    width: 0,
+    height: 0,
 }
 
 const Post = atom<PostModel>(DEFAULT_POST)

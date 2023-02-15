@@ -14,6 +14,8 @@ type Post = {
     link: string
     force_original?: boolean
     is_favorite?: boolean
+    width?: number
+    height?: number
 }
 
 type AutoCompleteTag = {
