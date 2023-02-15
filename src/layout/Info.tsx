@@ -127,6 +127,7 @@ const Info: FC = () => {
         if (general.mode === 'I') {
             input.current.focus()
         } else {
+            setAutoComplete({ index: -1, tags: [] })
             input.current.blur()
         }
 
@@ -251,7 +252,7 @@ const Info: FC = () => {
                 <select
                     ref={server}
                     className='server'
-                    defaultValue='yandere'
+                    defaultValue={Object.keys(SERVERS)[0]}
                     onChange={async e => {
                         // @ts-ignore
                         const new_server = SERVERS[e.currentTarget.value]

@@ -1,4 +1,4 @@
-import { yandere } from 'servers'
+import { SERVERS } from 'servers'
 
 import { atom } from 'jotai'
 import { GeneralModel, get_data, SetArgs } from 'state'
@@ -12,7 +12,7 @@ const DEFAULT_VALUE: GeneralModel = {
     page: 0,
     index: 0,
     posts: [],
-    server: yandere,
+    server: Object.values(SERVERS)[0]!,
 }
 
 const General = atom<GeneralModel>(DEFAULT_VALUE)
