@@ -1,10 +1,7 @@
-// https://tentaclerape.net/post/view/91358
 import { AutoCompleteTag, PostModel, ServerModel } from 'state'
 
 import { Parser } from './shared'
 import tags from './tentaclerape.tags.json'
-
-// const LAST_POST = 91358
 
 const BASE = 'https://tentaclerape.net/'
 
@@ -51,7 +48,6 @@ const tentaclerape: ServerModel = {
         const data: PostModel[] = []
 
         list.forEach(e => {
-            console.log(e)
             const id = parseInt(e.getAttribute('data-post-id')!)
             const tags = e.getAttribute('data-tags')!.split(' ')
             const is_video = !!tags.find(i =>
@@ -72,37 +68,7 @@ const tentaclerape: ServerModel = {
             })
         })
 
-        // console.log(data)
-
         return data
-
-        // return Array.from(Array(this.limit)).map((_, idx) => {
-
-        //     const id = LAST_POST - ((this.limit * page) - idx)
-
-        //     return {
-        //         file: ''
-        //     }
-        // })
-
-        // return data.map(item => {
-        //     const ext = item.file_url.split('.').at(-1) || 'png'
-
-        //     return {
-        //         type: 'image',
-        //         id: item.id,
-        //         sample: item.sample_url,
-        //         file: item.file_url,
-        //         score: item.score,
-        //         rating: rating_table[item.rating] || 'questionable',
-        //         tags: item.tags.split(' '),
-        //         parent_id: item.parent_id,
-        //         // ------
-        //         has_children: item.has_children,
-        //         ext,
-        //         link: 'https://yande.re/post/show/' + item.id,
-        //     }
-        // })
     },
 }
 
