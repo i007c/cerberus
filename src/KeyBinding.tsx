@@ -367,6 +367,7 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
     'V-KeyN-0-0-0-1': [['open_original', []]],
     'V-KeyB-0-0-0-1': [['download_original', []]],
     'V-KeyR-0-0-0-1': [['download_original', []]],
+    'V-KeyT-0-0-0-1': [['toggle_timeline', []]],
     // video controls
     'V-ArrowRight-0-0-0-0': [['update_video_time', [+1]]],
     'V-ArrowLeft-0-0-0-0': [['update_video_time', [-1]]],

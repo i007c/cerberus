@@ -32,6 +32,7 @@ const Content: FC = () => {
         video_muted: false,
         video_paused: false,
         show_volume: false,
+        show_timeline: true,
         overlay_info: false,
         overlay_info_tags: false,
         image: '',
@@ -66,6 +67,15 @@ const Content: FC = () => {
                     updateState(s => ({
                         ...s,
                         overlay_info_tags: !s.overlay_info_tags,
+                    }))
+                },
+            },
+            toggle_timeline: {
+                title: 'toggle timeline',
+                func: () => {
+                    updateState(s => ({
+                        ...s,
+                        show_timeline: !s.show_timeline,
                     }))
                 },
             },
@@ -201,7 +211,7 @@ const Content: FC = () => {
                     </div>
                 )}
 
-                {post.type === 'video' && (
+                {post.type === 'video' && state.show_timeline && (
                     <div className='timeline'>
                         <div
                             style={{
