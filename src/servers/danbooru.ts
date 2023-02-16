@@ -2,6 +2,8 @@ import axios from 'axios'
 
 import { Rating, ServerModel } from 'state'
 
+import { VIDEO_EXT } from './shared'
+
 type ACT = {
     type: string
     label: string
@@ -84,6 +86,7 @@ const danbooru: ServerModel = {
             data = response.data
         } catch (error) {
             alert(error)
+            return []
         }
 
         const rating_table: { [k: string]: Rating } = {
@@ -96,7 +99,7 @@ const danbooru: ServerModel = {
 
         return data.map(item => {
             return {
-                type: 'image',
+                type: VIDEO_EXT.includes(item.file_ext) ? 'video' : 'image',
                 id: item.id,
                 sample: item.large_file_url,
                 file: item.file_url,

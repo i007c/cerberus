@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import { Rating, ServerModel } from 'state'
 
 interface ACD {
@@ -42,8 +44,7 @@ const yandere: ServerModel = {
         let data: ACD[] = []
 
         try {
-            let response = await fetch(url, { signal: ACAC.signal })
-            data = await response.json()
+            data = (await axios.get(url, { signal: ACAC.signal })).data
         } catch (error) {
             return []
         }
@@ -66,13 +67,13 @@ const yandere: ServerModel = {
 
         if (tags) url += '&tags=' + tags
 
-        const response = await fetch(url)
-        let data: PD[] = []
+        let data: PD[]
 
         try {
-            data = await response.json()
+            data = (await axios.get(url)).data
         } catch (error) {
             alert(error)
+            return []
         }
 
         const rating_table: { [k: string]: Rating } = {

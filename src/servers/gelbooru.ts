@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import { ServerModel } from 'state'
 
 import { IMAGE_EXT, VIDEO_EXT } from './shared'
@@ -36,8 +38,7 @@ const gelbooru: ServerModel = {
         let data: ADC[] = []
 
         try {
-            let response = await fetch(url, { signal: ACAC.signal })
-            data = await response.json()
+            data = (await axios.get(url, { signal: ACAC.signal })).data
         } catch (error) {
             return []
         }
@@ -50,16 +51,18 @@ const gelbooru: ServerModel = {
     },
     async search(tags, page) {
         ACAC.abort()
+
         let url = 'https://gelbooru.com/index.php?page=dapi&s=post&json=1'
         url += '&q=index&pid=' + page
 
         if (tags) url += '&tags=' + tags
-
-        const response = await fetch(url)
-
-        let data = await response.json()
-
-        if (!data['post']) return []
+        let data
+        try {
+            data = (await axios.get(url)).data
+        } catch (error) {
+            alert(error)
+            return []
+        }
 
         let posts_list: PD[] = data['post']
 
