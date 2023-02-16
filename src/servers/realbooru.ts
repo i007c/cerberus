@@ -64,6 +64,7 @@ const realbooru: ServerModel = {
                 throw new Error(`realbooru ext not found ${ext}`)
             }
 
+
             let type: 'image' | 'video' = 'image'
 
             if (VIDEO_EXT.includes(ext)) {
