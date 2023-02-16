@@ -230,6 +230,7 @@ const Content: FC = () => {
                 <OverlayInfo
                     show={state.overlay_info}
                     show_tags={state.overlay_info_tags}
+                    video={video.current}
                 />
 
                 <Zoom source={post.type === 'video' ? video : image} />
@@ -237,25 +238,5 @@ const Content: FC = () => {
         </div>
     )
 }
-
-// type ImagePlateProps = {
-//     file: string
-//     sample: string
-//     imageRef: RefObject<HTMLImageElement>
-//     original: boolean
-// }
-
-// const ImagePlate: FC<ImagePlateProps> = ({
-//     file,
-//     sample,
-//     imageRef,
-//     original,
-// }) => {
-//     // const GeneralState = useAtomValue(GeneralAtom)
-//     console.log(original)
-
-//     return (
-//     )
-// }
 
 export default Content

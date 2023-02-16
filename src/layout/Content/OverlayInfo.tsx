@@ -1,14 +1,17 @@
 import React, { CSSProperties, FC, useEffect } from 'react'
 
+import { C } from '@00-team/utils'
+
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { ActionsAtom, GeneralAtom, PostAtom, PostModel, ZoomAtom } from 'state'
 
 type Props = {
     show: boolean
     show_tags: boolean
+    video?: HTMLVideoElement | null
 }
 
-const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
+const OverlayInfo: FC<Props> = ({ show, show_tags, video }) => {
     const register = useSetAtom(ActionsAtom)
     const setGeneral = useSetAtom(GeneralAtom)
     const general = useAtomValue(GeneralAtom)
@@ -70,8 +73,18 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                         <span>
                             {post.width}px / {post.height}px
                         </span>
+                        {post.type === 'video' && video && (
+                            <span
+                                className={
+                                    'video-detail' + C(video.paused, 'paused')
+                                }
+                            >
+                                {round(video.currentTime)}/
+                                {round(video.duration)}s
+                            </span>
+                        )}
                         <span className='id'>
-                            {post.id}
+                            id: {post.id}
                             {post.is_favorite ? ' 🩷' : ''}
                         </span>
                         {post.parent ? (
@@ -83,7 +96,7 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
                         )}
 
                         {post.score !== -1 && (
-                            <span className='score'>{post.score}</span>
+                            <span className='score'>score: {post.score}</span>
                         )}
                         <span className={'rating ' + post.rating}>
                             {post.rating}
@@ -97,8 +110,8 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
 
                 {general.mode == 'Z' && (
                     <span>
-                        {zoom.speed}s / {zoom.level}z / {Math.round(zoom.x)}x /{' '}
-                        {Math.round(zoom.y)}y
+                        {zoom.speed}s / {zoom.level}z / {round(zoom.x)}x /{' '}
+                        {round(zoom.y)}y
                     </span>
                 )}
             </div>
@@ -118,5 +131,7 @@ const OverlayInfo: FC<Props> = ({ show, show_tags }) => {
         </div>
     )
 }
+
+const round = Math.round
 
 export { OverlayInfo }
