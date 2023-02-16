@@ -36,6 +36,16 @@ const Info: FC = () => {
     const server = useRef<HTMLSelectElement>(null)
     const input = useRef<HTMLTextAreaElement>(null)
 
+    const updateUrl = (tags: string, sort_score: boolean, server: string) => {
+        const url = new URL(location.toString())
+
+        url.searchParams.set('tags', tags)
+        url.searchParams.set('sort_score', sort_score ? '1' : '0')
+        url.searchParams.set('server', server)
+
+        history.pushState({}, '', url)
+    }
+
     useEffect(() => {
         register({
             select_localfile: {
@@ -112,8 +122,15 @@ const Info: FC = () => {
                             ac_index: -1,
                         }
 
-                        if (input.current)
+                        if (input.current) {
                             input.current.value = new_state.input.join(' ')
+
+                            updateUrl(
+                                input.current.value,
+                                general.sort_score,
+                                general.server.name
+                            )
+                        }
 
                         return new_state
                     }),
@@ -124,12 +141,27 @@ const Info: FC = () => {
     useEffect(() => {
         if (!input.current) return
 
+        const url = new URL(location.toString())
+
+        input.current.value = url.searchParams.get('tags') || ''
+
+        setGeneral({
+            server: SERVERS[url.searchParams.get('server') || ''],
+            sort_score: !!parseInt(url.searchParams.get('sort_score') || ''),
+        })
+    }, [input])
+
+    useEffect(() => {
+        if (!input.current) return
+
         if (general.mode === 'I') {
             input.current.focus()
         } else {
             setAutoComplete({ index: -1, tags: [] })
             input.current.blur()
         }
+
+        updateUrl(input.current.value, general.sort_score, general.server.name)
 
         register({
             search: {
@@ -187,6 +219,12 @@ const Info: FC = () => {
                     ref={input}
                     tabIndex={0}
                     onInput={async e => {
+                        updateUrl(
+                            e.currentTarget.value,
+                            general.sort_score,
+                            general.server.name
+                        )
+
                         let new_tags = e.currentTarget.value
                             .split(' ')
                             .filter(v => v)
@@ -281,8 +319,8 @@ const Info: FC = () => {
                     className='server'
                     defaultValue={Object.keys(SERVERS)[0]}
                     onChange={async e => {
-                        // @ts-ignore
-                        const new_server = SERVERS[e.currentTarget.value]
+                        const new_server = SERVERS[e.currentTarget.value]!
+
                         setGeneral({
                             server: new_server,
                             favorite_list: await get_favorite_list(
