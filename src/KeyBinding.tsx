@@ -206,7 +206,7 @@ const KeyBinding: FC = () => {
                     `${B2B(e.metaKey)}-${B2B(e.shiftKey)}`
             )
 
-            Object.values(ActiveKeys).forEach(key => {
+            ActiveKeys.forEach(key => {
                 const keybinds = (
                     KeyBinds[`${general.mode}-${key}`] || []
                 ).concat(KeyBinds[`*-${key}`] || [])
