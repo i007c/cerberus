@@ -6,10 +6,10 @@ import { tentaclerape } from './tentaclerape'
 import { yandere } from './yandere'
 
 const SERVERS = {
+    rule34,
     danbooru,
     tentaclerape,
     yandere,
-    rule34,
     realbooru,
     gelbooru,
 }
