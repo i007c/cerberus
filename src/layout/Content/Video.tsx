@@ -26,7 +26,7 @@ const Video: FC<Props> = ({ show, file, videoRef, setState }) => {
             ref={videoRef}
             className='main'
             autoPlay
-            src={file}
+            src={show ? file : ''}
             style={{ display: show ? '' : 'none' }}
             onVolumeChange={e => {
                 if (volume_timeout) clearTimeout(volume_timeout)

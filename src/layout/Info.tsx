@@ -213,8 +213,19 @@ const Info: FC = () => {
 
                         if (!general.server.autocomplete || !changing) return
 
+                        let sign = ''
+
+                        if (changing.startsWith('-')) {
+                            changing = changing.slice(1)
+                            sign = '-'
+                        }
+
                         setAutoComplete({
-                            tags: await general.server.autocomplete(changing),
+                            tags: (
+                                await general.server.autocomplete(changing)
+                            ).map(t => {
+                                return { ...t, name: sign + t.name }
+                            }),
                             query: changing,
                             regQuery: new RegExp(
                                 `(${changing.replace(
