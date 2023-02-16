@@ -10,6 +10,11 @@ import VideoPlate from './Video'
 
 var loader_http: XMLHttpRequest | null = null
 
+type BufferType = {
+    left: string
+    right: string
+}
+
 const Content: FC = () => {
     const post = useAtomValue(PostAtom)
     const general = useAtomValue(GeneralAtom)
@@ -30,10 +35,40 @@ const Content: FC = () => {
         overlay_info_tags: false,
         image: '',
         loading: 0,
+        buffers: [] as BufferType[],
     })
 
     const setState = (args: Partial<typeof state>) =>
         updateState(s => ({ ...s, ...args }))
+
+    const updateBuffers = (V: HTMLVideoElement) => {
+        console.log(V.duration)
+
+        const inc = 100 / V.duration
+
+        let bb: BufferType[] = []
+
+        for (let i = 0; i < V.buffered.length; i++) {
+            const StartX = V.buffered.start(i) * inc
+            const EndX = 100 - V.buffered.end(i) * inc
+
+            bb.push({ left: `${StartX}%`, right: `${EndX}%` })
+        }
+
+        setState({ buffers: bb })
+    }
+
+    useEffect(() => {
+        if (!video.current) return
+
+        let upt = setInterval(() => {
+            updateBuffers(video.current!)
+        }, 1000)
+
+        return () => {
+            clearInterval(upt)
+        }
+    }, [video])
 
     useEffect(() => {
         register({
@@ -179,13 +214,12 @@ const Content: FC = () => {
                     }
                 }}
             >
-                {post.type === 'video' && (
-                    <VideoPlate
-                        file={post.file}
-                        videoRef={video}
-                        setState={setState}
-                    />
-                )}
+                <VideoPlate
+                    show={post.type === 'video'}
+                    file={post.file}
+                    videoRef={video}
+                    setState={setState}
+                />
 
                 {post.type === 'image' && state.image && (
                     <img ref={image} className='main' src={state.image} />
@@ -214,6 +248,16 @@ const Content: FC = () => {
                                     : '#0351c1',
                             }}
                         ></div>
+
+                        <div className='buffer-container'>
+                            {state.buffers.map(({ left, right }, index) => (
+                                <div
+                                    className='buffer'
+                                    key={index}
+                                    style={{ left: left, right: right }}
+                                ></div>
+                            ))}
+                        </div>
                     </div>
                 )}
 

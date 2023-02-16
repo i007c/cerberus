@@ -64,6 +64,19 @@
                 height: 100%;
                 width: 0%;
             }
+
+            .buffer-container {
+                position: absolute;
+                width: 100%;
+                z-index: -1;
+                background-color: transparent;
+
+                .buffer {
+                    position: absolute;
+                    height: 100%;
+                    background-color: #fff6;
+                }
+            }
         }
 
         .timeline > div {

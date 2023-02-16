@@ -6,12 +6,13 @@ import { ActionsAtom } from 'state'
 var volume_timeout: NodeJS.Timeout | null = null
 
 type Props = {
+    show: boolean
     file: string
     videoRef: RefObject<HTMLVideoElement>
     setState(args: {}): void
 }
 
-const Video: FC<Props> = ({ file, videoRef, setState }) => {
+const Video: FC<Props> = ({ show, file, videoRef, setState }) => {
     useEffect(() => {
         if (!videoRef.current) return
 
@@ -26,6 +27,7 @@ const Video: FC<Props> = ({ file, videoRef, setState }) => {
             className='main'
             autoPlay
             src={file}
+            style={{ display: show ? '' : 'none' }}
             onVolumeChange={e => {
                 if (volume_timeout) clearTimeout(volume_timeout)
 
