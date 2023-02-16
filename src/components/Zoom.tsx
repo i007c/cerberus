@@ -263,7 +263,7 @@ const draw_video: Draw<HTMLVideoElement> = (video, canvas) => {
 
             if (video.paused || video.ended || video.readyState !== 4) return
 
-            AbortVideoRender = setTimeout(timerCallback, 1)
+            AbortVideoRender = setTimeout(timerCallback, 1000 / 60)
         }
 
         timerCallback()
