@@ -42,8 +42,6 @@ const Content: FC = () => {
         updateState(s => ({ ...s, ...args }))
 
     const updateBuffers = (V: HTMLVideoElement) => {
-        console.log(V.duration)
-
         const inc = 100 / V.duration
 
         let bb: BufferType[] = []
