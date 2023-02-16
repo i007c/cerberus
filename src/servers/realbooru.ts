@@ -1,5 +1,6 @@
-import { IMAGE_EXT, update_tags, VIDEO_EXT } from './shared'
-import { PostModel, Rating, ServerModel } from 'types'
+import { PostModel, Rating, ServerModel } from 'state'
+
+import { IMAGE_EXT, VIDEO_EXT } from './shared'
 
 type JPost = {
     directory: string
@@ -20,11 +21,8 @@ var ACAC = new AbortController()
 const realbooru: ServerModel = {
     name: 'realbooru',
     limit: 500,
-    rating_table: {
-        q: 'questionable',
-        e: 'explicit',
-        s: 'safe',
-    },
+    sort_score: 'sort:score',
+
     autocomplete: async query => {
         ACAC.abort()
         ACAC = new AbortController()
@@ -45,9 +43,8 @@ const realbooru: ServerModel = {
             count: -1,
         }))
     },
-    search: async function (tags, page) {
+    async search(tags, page) {
         ACAC.abort()
-        tags = update_tags(tags, 'sort:score')
         let url = `https://realbooru.com/index.php?page=dapi&s=post&limit=${this.limit}`
         url += '&json=1&q=index&pid=' + page
 
@@ -56,44 +53,45 @@ const realbooru: ServerModel = {
         const response = await fetch(url)
 
         const json: JPost[] = await response.json()
-        // if (!text) return []
 
-        // const xml = Parser.parseFromString(text, 'text/xml')
-        // const posts = xml.querySelector('posts')!
-        // const posts_list = posts.querySelectorAll('post')
         const data: PostModel[] = []
 
         json.forEach(post => {
-            // const file = post.getAttribute('file_url')!
             const file = post.image
+            const ext = file.split('.').at(-1)
 
-            const ext = file.split('.').at(-1) || 'png'
+            if (!ext) {
+                throw new Error(`realbooru ext not found ${ext}`)
+            }
+
+
             let type: 'image' | 'video' = 'image'
 
             if (VIDEO_EXT.includes(ext)) {
                 type = 'video'
             } else if (!IMAGE_EXT.includes(ext)) {
-                throw Error(ext)
+                throw new Error(`realbooru invalid ext not found ${ext}`)
             }
 
             data.push({
                 type,
                 score: -1,
-                file: `https://realbooru.com/images/${post.directory}/${post.image}`,
-                parent_id: post.parent_id,
-                sample: `https://realbooru.com/images/${post.directory}/${post.image}`,
+                file: `https://realbooru.com/images/${post.directory}/${post.hash}.${ext}`,
+                parent: post.parent_id,
+                sample: `https://realbooru.com/images/${post.directory}/${post.hash}.${ext}`,
                 id: post.id,
                 has_children: false,
                 tags: post.tags.trim().split(' '),
                 rating: post.rating,
                 ext,
+                link: `https://realbooru.com/index.php?page=post&s=view&id=${post.id}`,
             })
         })
 
         return data
     },
-    open_post: post_id => {
-        open(`https://realbooru.com/index.php?page=post&s=view&id=${post_id}`)
+    open_tags(tags) {
+        open('https://realbooru.com/index.php?page=post&s=list&tags=' + tags)
     },
 }
 

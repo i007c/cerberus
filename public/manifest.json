@@ -41,7 +41,8 @@
         "https://*.gelbooru.com/*",
         "https://*.rule34.xxx/*",
         "https://*.yande.re/*",
-        "https://*.realbooru.com/*"
+        "https://*.realbooru.com/*",
+        "https://*.tentaclerape.net/*"
     ],
     "declarative_net_request": {
         "rule_resources": [

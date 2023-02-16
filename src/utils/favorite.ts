@@ -1,61 +1,30 @@
-import { overlay_info } from 'elements'
-import { State } from 'globals'
+import { SERVERS } from 'servers'
 
-async function load_favorite_list(server: string) {
-    let db = await chrome.storage.local.get('favorite_lists')
+import { GeneralModel, PostModel } from 'state'
 
-    if (db.favorite_lists === undefined) {
-        State.favorite_list = []
-        await chrome.storage.local.set({ favorite_lists: { [server]: [] } })
-    } else if (db.favorite_lists[server] === undefined) {
-        State.favorite_list = []
-        await chrome.storage.local.set({
-            favorite_lists: {
-                ...db.favorite_lists,
-                [server]: [],
-            },
-        })
-    } else {
-        State.favorite_list = db.favorite_lists[server]
-    }
-}
+;(async () => {
+    let db = (await chrome.storage.local.get('favorite_lists')).favorite_lists
 
-async function toggle_favorite_post(server: string, post_id: number) {
-    if (State.isLocal) return
+    if (typeof db !== 'object' || db === null) db = {}
 
-    let db = await chrome.storage.local.get('favorite_lists')
-
-    if (
-        db.favorite_lists === undefined ||
-        db.favorite_lists[server] === undefined
-    ) {
-        return
-    }
-
-    let deleted = false
-
-    State.favorite_list = State.favorite_list.filter(pid => {
-        if (pid === post_id) {
-            deleted = true
-            return false
+    Object.values(SERVERS).map(server => {
+        if (!Array.isArray(db[server.name])) {
+            db[server.name] = []
         }
-
-        return true
     })
-
-    if (!deleted) {
-        State.favorite_list.push(post_id)
-        overlay_info.id.innerText = `${post_id} 🩷`
-    } else {
-        overlay_info.id.innerText = `${post_id}`
-    }
 
     await chrome.storage.local.set({
-        favorite_lists: {
-            ...db.favorite_lists,
-            [server]: State.favorite_list,
-        },
+        favorite_lists: db,
     })
+})()
+
+async function get_favorite_list(server: string): Promise<PostModel[]> {
+    return (await chrome.storage.local.get('favorite_lists')).favorite_lists[
+        server
+    ]
 }
 
-export { toggle_favorite_post, load_favorite_list }
+const is_favorite = (general: GeneralModel, id: number) =>
+    !!general.favorite_list.find(v => v.id == id)
+
+export { is_favorite, get_favorite_list }

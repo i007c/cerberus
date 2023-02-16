@@ -1,5 +1,8 @@
-import { ServerModel } from 'types'
-import { IMAGE_EXT, update_tags, VIDEO_EXT } from './shared'
+import axios from 'axios'
+
+import { ServerModel } from 'state'
+
+import { IMAGE_EXT, VIDEO_EXT } from './shared'
 
 var ACAC = new AbortController()
 
@@ -25,7 +28,9 @@ interface PD {
 const gelbooru: ServerModel = {
     name: 'gelbooru',
     limit: 100,
-    autocomplete: async query => {
+    sort_score: 'sort:score',
+
+    async autocomplete(query) {
         ACAC.abort()
         ACAC = new AbortController()
 
@@ -33,8 +38,7 @@ const gelbooru: ServerModel = {
         let data: ADC[] = []
 
         try {
-            let response = await fetch(url, { signal: ACAC.signal })
-            data = await response.json()
+            data = (await axios.get(url, { signal: ACAC.signal })).data
         } catch (error) {
             return []
         }
@@ -45,19 +49,20 @@ const gelbooru: ServerModel = {
             count: parseInt(post_count),
         }))
     },
-    search: async function (tags, page) {
+    async search(tags, page) {
         ACAC.abort()
-        tags = update_tags(tags, 'sort:score')
+
         let url = 'https://gelbooru.com/index.php?page=dapi&s=post&json=1'
         url += '&q=index&pid=' + page
 
         if (tags) url += '&tags=' + tags
-
-        const response = await fetch(url)
-
-        let data = await response.json()
-
-        if (!data['post']) return []
+        let data
+        try {
+            data = (await axios.get(url)).data
+        } catch (error) {
+            alert(error)
+            return []
+        }
 
         let posts_list: PD[] = data['post']
 
@@ -82,13 +87,13 @@ const gelbooru: ServerModel = {
                 parent_id: post.parent_id === 0 ? null : post.parent_id,
                 score: post.score,
                 tags: post.tags.split(' '),
+                link: `https://gelbooru.com/index.php?page=post&s=view&id=${post.id}`,
             }
         })
     },
-    open_post: post_id => {
-        open(`https://gelbooru.com/index.php?page=post&s=view&id=${post_id}`)
+    open_tags(tags) {
+        open('https://gelbooru.com/index.php?page=post&s=list&tags=' + tags)
     },
-    rating_table: {},
 }
 
 export { gelbooru }

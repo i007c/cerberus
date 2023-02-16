@@ -96,6 +96,7 @@
         border-radius: 5px;
 
         li {
+            max-width: 500px;
             white-space: nowrap;
             overflow: hidden;
             color: #ddd;
@@ -111,6 +112,7 @@
 
             .count {
                 letter-spacing: -1.5px;
+                flex-shrink: 0;
             }
         }
 
@@ -128,13 +130,17 @@
 
     .server {
         width: 80%;
-        // pointer-events: all;
         background-color: #111;
         color: #ddd;
         font-size: 22px;
         border-radius: 7px;
         padding: 0.1rem 0.2rem;
         border: 2px solid #143fb4;
+        text-transform: capitalize;
+
+        option {
+            text-transform: capitalize;
+        }
     }
 
     .local-file::file-selector-button {

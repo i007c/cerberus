@@ -28,21 +28,6 @@
             object-fit: contain;
         }
 
-        .slideshow_bar {
-            --height: 3px;
-            position: absolute;
-            top: 0;
-            z-index: 0;
-            width: 100%;
-            height: var(--height);
-
-            > div {
-                width: 0%;
-                height: 100%;
-                background-color: #940cfe;
-            }
-        }
-
         .volume {
             position: absolute;
             border-radius: 5px;
@@ -54,6 +39,7 @@
             display: flex;
             align-items: flex-end;
             background-color: #111;
+            z-index: 1;
 
             > div {
                 width: 100%;
@@ -100,25 +86,6 @@
                 max-height: 400px;
             }
             // height: 300px;
-        }
-
-        .zoomed-container {
-            position: absolute;
-            inset: 0;
-            // width: 50%;
-            // bottom: 0;
-            // left: 0;
-            // border-top: 2px solid red;
-            // border-right: 2px solid red;
-            background-color: #040404;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            .zoomed {
-                width: 100%;
-                aspect-ratio: 16/9;
-            }
         }
     }
 

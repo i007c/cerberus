@@ -3,5 +3,7 @@
     "compilerOptions": {
         "baseUrl": "./",
         "rootDir": "./"
-    }
+    },
+    "include": ["./"],
+    "exclude": []
 }

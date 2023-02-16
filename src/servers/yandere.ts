@@ -1,6 +1,6 @@
-import { update_tags } from './shared'
+import axios from 'axios'
 
-import { ServerModel } from 'types'
+import { Rating, ServerModel } from 'state'
 
 interface ACD {
     name: string
@@ -33,11 +33,7 @@ var ACAC = new AbortController()
 const yandere: ServerModel = {
     name: 'yandere',
     limit: 500,
-    rating_table: {
-        q: 'questionable',
-        e: 'explicit',
-        s: 'safe',
-    },
+    sort_score: 'order:score',
 
     autocomplete: async function (query) {
         ACAC.abort()
@@ -48,8 +44,7 @@ const yandere: ServerModel = {
         let data: ACD[] = []
 
         try {
-            let response = await fetch(url, { signal: ACAC.signal })
-            data = await response.json()
+            data = (await axios.get(url, { signal: ACAC.signal })).data
         } catch (error) {
             return []
         }
@@ -66,20 +61,25 @@ const yandere: ServerModel = {
 
     search: async function (tags, page) {
         ACAC.abort()
-        tags = update_tags(tags, 'order:score')
         let url = `https://yande.re/post.json?limit=${this.limit}&page=${
             page + 1
         }`
 
         if (tags) url += '&tags=' + tags
 
-        const response = await fetch(url)
-        let data: PD[] = []
+        let data: PD[]
 
         try {
-            data = await response.json()
+            data = (await axios.get(url)).data
         } catch (error) {
             alert(error)
+            return []
+        }
+
+        const rating_table: { [k: string]: Rating } = {
+            q: 'questionable',
+            e: 'explicit',
+            s: 'safe',
         }
 
         data = data.filter(({ score }) => score !== null)
@@ -93,18 +93,18 @@ const yandere: ServerModel = {
                 sample: item.sample_url,
                 file: item.file_url,
                 score: item.score,
-                rating: this.rating_table[item.rating]!,
+                rating: rating_table[item.rating] || 'questionable',
                 tags: item.tags.split(' '),
                 parent_id: item.parent_id,
                 // ------
                 has_children: item.has_children,
                 ext,
+                link: 'https://yande.re/post/show/' + item.id,
             }
         })
     },
-
-    open_post: post_id => {
-        open('https://yande.re/post/show/' + post_id)
+    open_tags(tags) {
+        open('https://yande.re/post?tags=' + tags)
     },
 }
 

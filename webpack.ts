@@ -1,9 +1,8 @@
-import TsPaths from 'tsconfig-paths-webpack-plugin'
 // import { Configuration } from 'webpack'
 import CopyPlugin from 'copy-webpack-plugin'
 import HtmlPlugin from 'html-webpack-plugin'
-
 import { resolve } from 'path'
+import TsPaths from 'tsconfig-paths-webpack-plugin'
 
 const BASE_DIR = __dirname
 const SRC_DIR = resolve(BASE_DIR, 'src')
@@ -27,7 +26,7 @@ const Main = {
                 use: 'ts-loader',
             },
             {
-                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                test: /\.(png|svg|jpg|jpeg|gif|mp4)$/i,
                 type: 'asset/resource',
             },
             {
@@ -48,7 +47,7 @@ const Main = {
             ],
         }),
         new HtmlPlugin({
-            template: resolve(SRC_DIR, 'index.html'),
+            template: resolve(SRC_DIR, 'template.html'),
             minify: false,
         }),
     ],
@@ -58,11 +57,21 @@ const Main = {
             new TsPaths({ configFile: resolve(SRC_DIR, 'tsconfig.json') }),
         ],
     },
-    optimization: {
-        emitOnErrors: false,
-        chunkIds: 'deterministic',
-        minimize: true,
-    },
+    // optimization: {
+    //     emitOnErrors: false,
+    //     chunkIds: 'deterministic',
+    //     minimize: true,
+    // },
+    // devServer: {
+    //     port: 8000,
+    //     hot: true, // true = full reload
+    //     historyApiFallback: true,
+    //     compress: true,
+    //     client: {
+    //         logging: 'none',
+    //         reconnect: 7,
+    //     },
+    // },
 }
 
 export default Main

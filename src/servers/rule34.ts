@@ -1,5 +1,6 @@
-import { PostModel, Rating, ServerModel } from 'types'
-import { IMAGE_EXT, Parser, update_tags, VIDEO_EXT } from './shared'
+import { PostModel, Rating, ServerModel } from 'state'
+
+import { IMAGE_EXT, Parser, VIDEO_EXT } from './shared'
 
 interface ACD {
     value: string
@@ -12,12 +13,9 @@ var ACAC = new AbortController()
 const rule34: ServerModel = {
     name: 'rule34',
     limit: 500,
-    rating_table: {
-        q: 'questionable',
-        e: 'explicit',
-        s: 'safe',
-    },
-    autocomplete: async query => {
+    sort_score: 'sort:score',
+
+    async autocomplete(query) {
         ACAC.abort()
         ACAC = new AbortController()
 
@@ -43,9 +41,8 @@ const rule34: ServerModel = {
             }
         })
     },
-    search: async function (tags, page) {
+    async search(tags, page) {
         ACAC.abort()
-        tags = update_tags(tags, 'sort:score')
         let url = `https://api.rule34.xxx/index.php?page=dapi&s=post&limit=${this.limit}`
         url += '&q=index&pid=' + page
 
@@ -73,32 +70,40 @@ const rule34: ServerModel = {
             const ext = file.split('.').at(-1) || 'png'
             let type: 'image' | 'video' = 'image'
 
-            const rating_key = <'q' | 's' | 'e'>post.getAttribute('rating')
-
             if (VIDEO_EXT.includes(ext)) {
                 type = 'video'
             } else if (!IMAGE_EXT.includes(ext)) {
                 throw Error(ext)
             }
 
+            const rating_key = post.getAttribute('rating') || 'q'
+            const rating_table: { [k: string]: Rating } = {
+                q: 'questionable',
+                e: 'explicit',
+                s: 'safe',
+            }
+
+            const post_id = parseInt(post.getAttribute('id')!)
+
             data.push({
                 type,
                 score: parseInt(post.getAttribute('score')!),
                 file: file,
-                parent_id: parseInt(post.getAttribute('parent_id')!),
+                parent: parseInt(post.getAttribute('parent_id')!),
                 sample: post.getAttribute('sample_url')!,
-                id: parseInt(post.getAttribute('id')!),
+                id: post_id,
                 has_children: post.getAttribute('has_children') === 'true',
                 tags: post.getAttribute('tags')!.trim().split(' '),
-                rating: <Rating>this.rating_table[rating_key],
+                rating: rating_table[rating_key] || 'questionable',
                 ext,
+                link: `https://rule34.xxx/index.php?page=post&s=view&id=${post_id}`,
             })
         })
 
         return data
     },
-    open_post: post_id => {
-        open(`https://rule34.xxx/index.php?page=post&s=view&id=${post_id}`)
+    open_tags(tags) {
+        open('https://rule34.xxx/index.php?page=post&s=list&tags=' + tags)
     },
 }
 
