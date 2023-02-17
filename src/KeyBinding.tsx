@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react'
 
-import { get_favorite_list, now_iso } from 'utils'
+import { now_iso } from 'utils'
 
 import { useAtom } from 'jotai'
 import {
@@ -57,6 +57,15 @@ const KeyBinding: FC = () => {
                 },
             },
         })
+
+        //        const load_fav_list = async () => {
+        //            let fav_list = await get_favorite_list(general.server.name)
+        //
+        //            setGeneral({
+        //                favorite_list: fav_list,
+        //            })
+        //        }
+        //        load_fav_list()
     }, [general])
 
     useEffect(() => {
@@ -190,10 +199,6 @@ const KeyBinding: FC = () => {
                 },
             },
         })
-
-        setGeneral(async s => ({
-            favorite_list: await get_favorite_list(s.server.name),
-        }))
     }, [])
 
     useEffect(() => {

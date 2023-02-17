@@ -11,18 +11,11 @@ export * from './models/Zoom'
 export { SetArgs, get_data }
 //
 
-type SetArgs<T> = Partial<T> | ((s: T) => Partial<T> | Promise<Partial<T>>)
+type SetArgs<T> = Partial<T> | ((s: T) => Partial<T>)
 
-const get_data = async <T>(args: SetArgs<T>, state: T): Promise<T> => {
+const get_data = <T>(args: SetArgs<T>, state: T): T => {
     if (typeof args === 'function') {
-        let data = {}
-        let result = args(state)
-
-        if (result instanceof Promise) {
-            data = await result
-        } else {
-            data = result
-        }
+        let data = args(state)
 
         return { ...state, ...data }
     } else {

@@ -19,8 +19,8 @@ const General = atom<GeneralModel>(DEFAULT_VALUE)
 
 const GeneralAtom = atom(
     get => get(General),
-    async (get, set, args: SetArgs<GeneralModel>) => {
-        set(General, await get_data(args, get(General)))
+    (get, set, args: SetArgs<GeneralModel>) => {
+        set(General, get_data(args, get(General)))
     }
 )
 

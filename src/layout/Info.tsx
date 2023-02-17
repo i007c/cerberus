@@ -36,6 +36,25 @@ const Info: FC = () => {
     const server = useRef<HTMLSelectElement>(null)
     const input = useRef<HTMLTextAreaElement>(null)
 
+    const search = async (tags: string, g: typeof general) => {
+        setAutoComplete({ index: -1, tags: [] })
+        setGeneral({
+            end_page: false,
+            mode: 'V',
+            index: 0,
+            page: 0,
+        })
+
+        if (g.sort_score) {
+            tags += ' ' + g.server.sort_score
+        }
+
+        let new_posts = await g.server.search(tags, 0)
+
+        setGeneral({ posts: new_posts })
+        setPost(new_posts[0] || { type: 'null', id: 0 })
+    }
+
     const updateUrl = (tags: string, sort_score: boolean, server: string) => {
         const url = new URL(location.toString())
 
@@ -139,17 +158,26 @@ const Info: FC = () => {
     }, [AutoComplete])
 
     useEffect(() => {
-        if (!input.current) return
+        if (!input.current || !server.current) return
 
         const url = new URL(location.toString())
+        const server_name = url.searchParams.get('server') || ''
+        const server_data = SERVERS[server_name]
+        const sort_score = !!parseInt(url.searchParams.get('sort_score') || '')
+
+        if (server_data) {
+            server.current.value = server_name
+            setGeneral({
+                server: server_data,
+                sort_score,
+            })
+            general.server = server_data
+            general.sort_score = sort_score
+        }
 
         input.current.value = url.searchParams.get('tags') || ''
-
-        setGeneral({
-            server: SERVERS[url.searchParams.get('server') || ''],
-            sort_score: !!parseInt(url.searchParams.get('sort_score') || ''),
-        })
-    }, [input])
+        search(input.current.value, general)
+    }, [input, server])
 
     useEffect(() => {
         if (!input.current) return
@@ -369,14 +397,16 @@ const Info: FC = () => {
                             })
                         )
 
-                        await setGeneral(async s => ({
+                        let fav_list = await get_favorite_list(
+                            general.server.name
+                        )
+
+                        setGeneral({
                             end_page: true,
                             page: 0,
                             posts,
-                            favorite_list: await get_favorite_list(
-                                s.server.name
-                            ),
-                        }))
+                            favorite_list: fav_list,
+                        })
 
                         if (posts[0]) setPost(posts[0])
                     }}
