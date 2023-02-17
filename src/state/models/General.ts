@@ -11,5 +11,6 @@ type General = {
     index: number
     posts: PostModel[]
     server: ServerModel
+    tags: string[]
 }
 export { General as GeneralModel, Mode }

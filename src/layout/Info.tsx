@@ -144,6 +144,8 @@ const Info: FC = () => {
                         if (input.current) {
                             input.current.value = new_state.input.join(' ')
 
+                            setGeneral({ tags: new_state.input })
+
                             updateUrl(
                                 input.current.value,
                                 general.sort_score,
@@ -240,6 +242,8 @@ const Info: FC = () => {
                         let new_tags = e.currentTarget.value
                             .split(' ')
                             .filter(v => v)
+
+                        setGeneral({ tags: new_tags })
 
                         let changing = ''
 

@@ -27,7 +27,7 @@ const KeyBinding: FC = () => {
         register({
             content_movement: {
                 title: 'go to the next or previous post',
-                func: (_, args) => {
+                func: async (_, args) => {
                     const update = get_movement(args)
 
                     if (general.posts.length === 0) {
@@ -42,12 +42,35 @@ const KeyBinding: FC = () => {
                     if (index >= general.posts.length) {
                         index = 0
 
-                        // if (!general.isLocal && !State.end_page) {
-                        //     State.page++
-                        //     search()
-                        //     return
-                        // }
-                    } else if (index < 0) {
+                        if (!general.end_page) {
+                            if (general.sort_score) {
+                                general.tags.push(general.server.sort_score)
+                            }
+
+                            let new_posts = await general.server.search(
+                                general.tags.join(' '),
+                                general.page + 1
+                            )
+
+                            if (new_posts.length == 0) {
+                                setGeneral({
+                                    index: 0,
+                                    end_page: true,
+                                })
+                                return
+                            }
+
+                            setGeneral(s => ({
+                                posts: s.posts.concat(new_posts),
+                                page: general.page + 1,
+                                index: s.index + 1,
+                            }))
+                            setPost(new_posts[0] || { type: 'null', id: 0 })
+                            return
+                        }
+                    }
+
+                    if (index < 0) {
                         index = general.posts.length - 1
                     }
 

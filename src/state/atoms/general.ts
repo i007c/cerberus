@@ -13,6 +13,7 @@ const DEFAULT_VALUE: GeneralModel = {
     index: 0,
     posts: [],
     server: Object.values(SERVERS)[0]!,
+    tags: [],
 }
 
 const General = atom<GeneralModel>(DEFAULT_VALUE)
