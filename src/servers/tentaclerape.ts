@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import { AutoCompleteTag, PostModel, ServerModel } from 'state'
 
 import { Parser } from './shared'
@@ -15,13 +17,12 @@ const tentaclerape: ServerModel = {
 
         let ac: AutoCompleteTag[] = []
 
-        for (let i = 0; i < tags.length; i++) {
-            const tag = tags[i]!
+        tags.forEach(tag => {
             if (tag.name.indexOf(query) !== -1) {
-                ac.push({ ...tag, type: 'general' })
-                if (ac.length > 9) return ac
+                ac.push(tag)
+                if (ac.length > 9) return
             }
-        }
+        })
 
         return ac
     },
@@ -53,13 +54,16 @@ const tentaclerape: ServerModel = {
             const is_video = !!tags.find(i =>
                 ['video', 'webm', 'mp4'].includes(i)
             )
+            let ext = 'png'
+            if (is_video) ext = 'mp4'
+            else if (tags.includes('animated')) ext = 'gif'
 
             data.push({
                 id,
                 link: BASE + e.getAttribute('href'),
                 file: `${BASE}/index.php?q=/image/${id}`,
                 sample: BASE + e.querySelector('img')!.getAttribute('src'),
-                ext: 'png',
+                ext,
                 has_children: false,
                 rating: 'explicit',
                 score: -1,
@@ -75,4 +79,35 @@ const tentaclerape: ServerModel = {
     },
 }
 
-export { tentaclerape }
+const get_tags = async () => {
+    const pattern = new RegExp(/.+\((\d+)\)/)
+    const url = 'https://tentaclerape.net/tags/popularity'
+
+    const response = await axios.get(url)
+    const data = Parser.parseFromString(response.data, 'text/html')
+    const tags: AutoCompleteTag[] = []
+
+    data.querySelector('#Tagsmain div.blockbody')!
+        .querySelectorAll('a')
+        .forEach(a => {
+            const count = parseInt(a.text.match(pattern)![1]!)
+            const name = a.getAttribute('href')!.slice(11, -2)
+
+            tags.push({
+                name: name.toLowerCase(),
+                type: 'general',
+                count,
+            })
+        })
+
+    const tags_url = URL.createObjectURL(
+        new Blob([JSON.stringify(tags)], { type: 'application/json' })
+    )
+
+    await chrome.downloads.download({
+        url: tags_url,
+        filename: `tentaclerape.tags.json`,
+    })
+}
+
+export { tentaclerape, get_tags }

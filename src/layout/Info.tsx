@@ -164,6 +164,8 @@ const Info: FC = () => {
         const server_name = url.searchParams.get('server') || ''
         const server_data = SERVERS[server_name]
         const sort_score = !!parseInt(url.searchParams.get('sort_score') || '')
+        const tags = url.searchParams.get('tags') || ''
+        input.current.value = tags
 
         if (server_data) {
             server.current.value = server_name
@@ -173,10 +175,9 @@ const Info: FC = () => {
             })
             general.server = server_data
             general.sort_score = sort_score
-        }
 
-        input.current.value = url.searchParams.get('tags') || ''
-        search(input.current.value, general)
+            if (tags) search(tags, general)
+        }
     }, [input, server])
 
     useEffect(() => {
@@ -197,24 +198,7 @@ const Info: FC = () => {
                 func: async () => {
                     if (!input.current) return
 
-                    setAutoComplete({ index: -1, tags: [] })
-                    setGeneral({
-                        end_page: false,
-                        mode: 'V',
-                        index: 0,
-                        page: 0,
-                    })
-
-                    let tags = input.current.value
-
-                    if (general.sort_score) {
-                        tags += ' ' + general.server.sort_score
-                    }
-
-                    let new_posts = await general.server.search(tags, 0)
-
-                    setGeneral({ posts: new_posts })
-                    setPost(new_posts[0] || { type: 'null', id: 0 })
+                    search(input.current.value, general)
                 },
             },
             open_tags: {

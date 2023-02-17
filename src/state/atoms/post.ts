@@ -28,9 +28,9 @@ const Post = atom<PostModel>(DEFAULT_POST)
 
 const PostAtom = atom(
     get => get(Post),
-    async (get, set, args: SetArgs<PostModel>) => {
+    (get, set, args: SetArgs<PostModel>) => {
         const state = get(Post)
-        const data = await get_data(args, state)
+        const data = get_data(args, state)
 
         if (state.type === 'null' && data.type === 'null') {
             // dont do anything
@@ -58,8 +58,8 @@ const AutoComplete = atom<AutoCompleteModel>(DEFAULT_AC)
 
 const AutoCompleteAtom = atom(
     get => get(AutoComplete),
-    async (get, set, args: SetArgs<AutoCompleteModel>) => {
-        let data = await get_data(args, get(AutoComplete))
+    (get, set, args: SetArgs<AutoCompleteModel>) => {
+        let data = get_data(args, get(AutoComplete))
         data.index = 0
 
         set(AutoComplete, data)

@@ -1,6 +1,7 @@
 import React, { FC, useEffect } from 'react'
 
-import { now_iso } from 'utils'
+import { get_tags } from 'servers/tentaclerape'
+import { get_favorite_list, now_iso } from 'utils'
 
 import { useAtom } from 'jotai'
 import {
@@ -57,15 +58,6 @@ const KeyBinding: FC = () => {
                 },
             },
         })
-
-        //        const load_fav_list = async () => {
-        //            let fav_list = await get_favorite_list(general.server.name)
-        //
-        //            setGeneral({
-        //                favorite_list: fav_list,
-        //            })
-        //        }
-        //        load_fav_list()
     }, [general])
 
     useEffect(() => {
@@ -198,7 +190,22 @@ const KeyBinding: FC = () => {
                     })
                 },
             },
+            get_ttrp_tags: {
+                title: 'get tentaclerape tags',
+                func: () => {
+                    get_tags()
+                },
+            },
         })
+
+        const load_fav_list = async () => {
+            let fav_list = await get_favorite_list(general.server.name)
+
+            setGeneral({
+                favorite_list: fav_list,
+            })
+        }
+        load_fav_list()
     }, [])
 
     useEffect(() => {
@@ -312,6 +319,7 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
     'O-KeyG-0-0-0-0': [['export_local_favorites', []]],
     'O-KeyH-0-0-0-0': [['import_local_favorites', []]],
     'O-KeyU-0-0-0-0': [['open_tags', []]],
+    'O-KeyJ-0-0-0-0': [['get_ttrp_tags', []]],
 
     // insert mode
     'I-Enter-0-0-0-0': [['search', []]],
