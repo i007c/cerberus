@@ -1,5 +1,7 @@
 import React, { FC, RefObject, useEffect, useRef } from 'react'
 
+import { ParsedFrame } from 'gifuct-js'
+
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { ActionsAtom, GeneralAtom, PostAtom, ZoomAtom, ZoomModel } from 'state'
 
@@ -7,9 +9,11 @@ import './style/zoom.scss'
 
 type Props = {
     source: RefObject<HTMLVideoElement | HTMLImageElement>
+    gif_frames: ParsedFrame[]
 }
 
 var AbortVideoRender: NodeJS.Timeout | null = null
+// var GifRenderer: NodeJS.Timeout | null = null
 var draw: DrawFunc = _ => console.log('not set')
 
 const Zoom: FC<Props> = ({ source: src }) => {
@@ -152,15 +156,17 @@ const Zoom: FC<Props> = ({ source: src }) => {
         if (!source || !canvas) return
 
         if (source instanceof HTMLImageElement) {
-            draw = draw_image(source, canvas)
             setZoom({
                 speed: Math.round(
                     (source.naturalWidth + source.naturalHeight) / 20
                 ),
             })
-
             source.onload = () => {
+                // if (post.ext === 'gif' && gif_frames.length > 0) {
+                //     draw = draw_gif([source, gif_frames], canvas)
+                // } else {
                 draw = draw_image(source, canvas)
+                // }
                 setZoom({
                     speed: Math.round(
                         (source.naturalWidth + source.naturalHeight) / 20
@@ -168,6 +174,12 @@ const Zoom: FC<Props> = ({ source: src }) => {
                 })
                 draw(zoom)
             }
+
+            // if (post.ext === 'gif' && gif_frames.length > 0) {
+            //     draw = draw_gif([source, gif_frames], canvas)
+            // } else {
+            draw = draw_image(source, canvas)
+            // }
         } else {
             draw = draw_video(source, canvas)
 
@@ -230,6 +242,68 @@ const draw_image: Draw<HTMLImageElement> = (image, canvas) => {
     }
 }
 
+/*
+
+const draw_gif: Draw<[HTMLImageElement, ParsedFrame[]]> = (
+    [image, frames],
+    canvas
+) => {
+    if (image.naturalWidth > image.naturalHeight) {
+        canvas.width = (image.naturalHeight * 16) / 9
+        canvas.height = image.naturalHeight
+    } else {
+        canvas.width = image.naturalWidth
+        canvas.height = (image.naturalWidth * 9) / 16
+    }
+
+    const context = canvas.getContext('2d')!
+    const dims = frames[0]!.dims
+    const image_data = context.createImageData(dims.width, dims.height)
+    let frame_index = 0
+
+    return state => {
+        if (GifRenderer) {
+            clearTimeout(GifRenderer)
+            GifRenderer = null
+        }
+
+        function render() {
+            let frame = frames[frame_index]!
+
+            const start = new Date().getTime()
+
+            context.clearRect(0, 0, canvas.width, canvas.height)
+            image_data.data.set(frame.patch)
+
+            context.putImageData(
+                image_data,
+                0,
+                0,
+                state.x,
+                state.y,
+                (canvas.width * 10) / state.level,
+                (canvas.height * 10) / state.level
+            )
+
+            // update the frame index
+            frame_index++
+            if (frame_index >= frames.length) {
+                frame_index = 0
+            }
+
+            let end = new Date().getTime()
+            let diff = end - start
+
+            GifRenderer = setTimeout(function () {
+                requestAnimationFrame(render)
+                //renderFrame();
+            }, Math.max(0, Math.floor(frame.delay - diff)))
+        }
+
+        render()
+    }
+}
+*/
 const draw_video: Draw<HTMLVideoElement> = (video, canvas) => {
     if (video.videoWidth > video.videoHeight) {
         canvas.width = (video.videoHeight * 16) / 9

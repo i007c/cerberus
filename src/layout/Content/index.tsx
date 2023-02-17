@@ -1,5 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react'
 
+import { decompressFrames, parseGIF, ParsedFrame } from 'gifuct-js'
+
 import { useAtomValue, useSetAtom } from 'jotai'
 import { ActionsAtom, GeneralAtom, get_movement, PostAtom } from 'state'
 
@@ -34,6 +36,7 @@ const Content: FC = () => {
         overlay_info: false,
         overlay_info_tags: false,
         image: '',
+        gif_frames: [] as ParsedFrame[],
         loading: 0,
         buffers: [] as BufferType[],
     })
@@ -189,8 +192,18 @@ const Content: FC = () => {
         loader_http.responseType = 'arraybuffer'
 
         loader_http.onload = function () {
+            let frames = [] as ParsedFrame[]
+
+            if (post.ext === 'gif') {
+                frames = decompressFrames(parseGIF(this.response), true)
+            }
+
             var blob = new Blob([this.response])
-            setState({ loading: 0, image: URL.createObjectURL(blob) })
+            setState({
+                loading: 0,
+                image: URL.createObjectURL(blob),
+                gif_frames: frames,
+            })
         }
 
         loader_http.onprogress = function (e) {
@@ -277,7 +290,10 @@ const Content: FC = () => {
                     video={video.current}
                 />
 
-                <Zoom source={post.type === 'video' ? video : image} />
+                <Zoom
+                    source={post.type === 'video' ? video : image}
+                    gif_frames={state.gif_frames}
+                />
             </div>
         </div>
     )
