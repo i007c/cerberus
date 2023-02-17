@@ -174,6 +174,7 @@ const Info: FC = () => {
             setGeneral({
                 server: server_data,
                 sort_score,
+                tags: tags.split(' ').filter(v => v),
             })
             general.server = server_data
             general.sort_score = sort_score
