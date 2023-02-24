@@ -25,6 +25,23 @@ const KeyBinding: FC = () => {
 
     useEffect(() => {
         register({
+            download_original: {
+                title: 'download original',
+                func: () => {
+                    if (post.type === 'null') return
+                    document.dispatchEvent(ClearActiveKeys)
+                    chrome.downloads.download({
+                        url: post.file,
+                        conflictAction: 'uniquify',
+                        filename: `cerberus/${general.server.name}-${post.id}.${post.ext}`,
+                    })
+                },
+            },
+        })
+    }, [general, post])
+
+    useEffect(() => {
+        register({
             content_movement: {
                 title: 'go to the next or previous post',
                 func: async (_, args) => {
@@ -99,17 +116,6 @@ const KeyBinding: FC = () => {
                     if (post.type === 'null') return
                     document.dispatchEvent(ClearActiveKeys)
                     open(post.file)
-                },
-            },
-            download_original: {
-                title: 'download original',
-                func: () => {
-                    if (post.type === 'null') return
-                    document.dispatchEvent(ClearActiveKeys)
-                    chrome.downloads.download({
-                        url: post.file,
-                        conflictAction: 'uniquify',
-                    })
                 },
             },
             copy_post_id: {
@@ -369,6 +375,7 @@ const KeyBinds: { [k: string]: KeyBindModel[] } = {
     'Z-KeyF-0-0-0-0': [['toggle_fullscreen', []]],
     'Z-KeyQ-0-0-0-0': [['set_mode', ['V']]],
     'Z-KeyU-0-0-0-0': [['open_current_post', []]],
+    'Z-KeyR-0-0-0-0': [['toggle_favorite_post', []]],
     // video controls
     'Z-Space-0-0-0-0': [['toggle_video_playing', []]],
     'Z-ArrowRight-0-0-0-0': [['update_video_time', [+1]]],

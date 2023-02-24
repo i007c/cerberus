@@ -42,7 +42,8 @@
         "https://*.rule34.xxx/*",
         "https://*.yande.re/*",
         "https://*.realbooru.com/*",
-        "https://*.tentaclerape.net/*"
+        "https://*.tentaclerape.net/*",
+        "https://*.pornpen.ai/*"
     ],
     "declarative_net_request": {
         "rule_resources": [
