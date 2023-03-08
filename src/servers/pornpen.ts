@@ -2,6 +2,12 @@ import { ServerModel } from 'state'
 
 import data from './pornpen.data.json'
 
+/*
+
+g = []; document.querySelector("#root > div > div.text-white.w-full > div.infinite-scroll-component__outerdiv > div > div.flex.flex-wrap.justify-center").querySelectorAll('a').forEach(a => {g.push({link: a.href,image: a.children[0].src})}); g
+
+*/
+
 const pornpen: ServerModel = {
     name: 'pornpen',
     limit: 500,
@@ -18,15 +24,14 @@ const pornpen: ServerModel = {
             return {
                 type: 'image',
                 id: idx,
-                sample: item.imageUrl,
-                file: item.imageUrl,
+                sample: item.image,
+                file: item.image,
                 score: -1,
                 rating: 'questionable',
                 tags: [],
-                // ------
                 has_children: false,
                 ext: 'png',
-                link: 'https://pornpen.ai/view/' + item.imageId,
+                link: item.link,
             }
         })
     },
